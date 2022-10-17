@@ -6,17 +6,17 @@ public class Worker
     public int WorkerId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string Phone { get; set; }
+    public int PhoneNumber { get; set; }
     public string Mail{ get; set; } 
     public string Address { get; set; }
     
     // TODO: Authentication
 
-    public Worker(string firstName, string lastName, string phone, string mail, string address)
+    public Worker(string firstName, string lastName, int phoneNumber, string mail, string address)
     {
         FirstName = firstName;
         LastName = lastName;
-        Phone = phone;
+        PhoneNumber = phoneNumber;
         Mail = mail;
         Address = address;
     }

@@ -5,16 +5,16 @@ public class WorkerCreationDto
     // # Fields
     public string FirstName { get; }
     public string LastName { get; }
-    public string Phone { get; }
+    public int PhoneNumber { get; }
     public string Mail { get; }
     public string Address { get; }
     
     // ¤ Constructor
-    public WorkerCreationDto(string firstName, string lastName, string phone, string mail, string address)
+    public WorkerCreationDto(string firstName, string lastName, int phoneNumber, string mail, string address)
     {
         FirstName = firstName;
         LastName = lastName;
-        Phone = phone;
+        PhoneNumber = phoneNumber;
         Mail = mail;
         Address = address;
     }
