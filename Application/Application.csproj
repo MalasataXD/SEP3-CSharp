@@ -7,9 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="DAOInterfaces" />
-      <Folder Include="Logic" />
-      <Folder Include="LogicInterfaces" />
+        <Folder Include="DAOInterfaces"/>
+        <Folder Include="Logic"/>
+        <Folder Include="LogicInterfaces"/>
     </ItemGroup>
 
 </Project>
