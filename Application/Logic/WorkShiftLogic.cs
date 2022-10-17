@@ -29,6 +29,8 @@ public class WorkShiftLogic : IWorkShiftLogic
 
         WorkShift workShift = new(toCreate.Date, toCreate.ToTime, toCreate.FromTime, worker, toCreate.BreakAmount);
 
+        ValidateWorkShift(workShift);
+     
         return await _WorkShiftDao.CreateAsync(workShift);
     }
 
@@ -86,11 +88,94 @@ public class WorkShiftLogic : IWorkShiftLogic
     }
 
 
-    public void ValidateWorkShift()
+    private void ValidateWorkShift(WorkShift workShift)
     {
-        
+        //todo check for absence
+        //todo add unitTesting!
+        ValidateDate(workShift.Date);
+        ValidateTime(workShift.FromTime);
+        ValidateTime(workShift.ToTime);
+        ValidateTimes(workShift.FromTime, workShift.ToTime);
+        IsWorkerOccupied(workShift.Worker.getFullName(), workShift.Date, workShift.FromTime, workShift.ToTime);
     }
 
+    private void ValidateDate(string date)
+    {
+        string[] temp = date.Split("/");
+        
+        // todo add methods: how many days in month + isLeapYear + more??
+        // ? make date class ?
+    }
 
+    private void ValidateTime(string time)
+    {
+        try
+        {
+            char[] temp = time.ToCharArray();
+        
+            int timeHour = temp[0] * 10 + temp[1];
+            int timeMinute = temp[3] * 10 + temp[4];
 
+            if (!(temp[2].ToString().Equals(":") && time.Length == 5))
+            {
+                throw new Exception("Invalid timeformat");
+            }
+            
+            if (!(timeHour is >= 0 and <= 23))
+            {
+                throw new Exception("Invalid time");
+            }
+
+            if (!(timeMinute is >= 0 and <= 59))
+            {
+                throw new Exception("Invalid time");
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Invalid timeformat");
+        }
+    }
+
+    private void ValidateTimes(string fromTime, string toTime)
+    {
+        if (TimeToMinutes(fromTime) >= TimeToMinutes(toTime))
+        {
+            throw new Exception("fromTime has to be before toTime");
+        }
+    }
+
+    private async void IsWorkerOccupied(string fullName, string date, string fromTime, string toTime)
+    {
+        SearchShiftParametersDto dto = new (date, fullName);
+        IEnumerable<WorkShift> workShifts = await _WorkShiftDao.GetAsync(dto);
+
+        int fromTimeMinutes = TimeToMinutes(fromTime);
+        int toTimeMinutes = TimeToMinutes(toTime);
+        
+        foreach (var workShift in workShifts)
+        {
+            if (fromTimeMinutes <= TimeToMinutes(workShift.FromTime) && TimeToMinutes(workShift.FromTime) <= toTimeMinutes)
+            {
+                throw new Exception($"{fullName} already has a shift at that time!");
+            }
+
+            if (fromTimeMinutes <= TimeToMinutes(workShift.ToTime) && TimeToMinutes(workShift.ToTime) <= toTimeMinutes)
+            {
+                throw new Exception($"{fullName} already has a shift at that time!");
+            }
+
+            if (TimeToMinutes(workShift.FromTime) <= fromTimeMinutes && toTimeMinutes <= TimeToMinutes(workShift.ToTime))
+            {
+                throw new Exception($"{fullName} already has a shift at that time!");
+            }
+        }
+    }
+
+    private int TimeToMinutes(string time)
+    {
+        char[] temp = time.ToCharArray();
+
+        return temp[0] * 600 + temp[1] * 60 + temp[3] * 10 + temp[4];
+    }
 }

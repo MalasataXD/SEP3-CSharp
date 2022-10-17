@@ -10,11 +10,11 @@ namespace Application.Logic;
 public class WorkerLogic : IWorkerLogic
 {
     
-    private readonly IWorkerDao workerDao;
+    private readonly IWorkerDao _workerDao;
 
     public WorkerLogic(IWorkerDao workerDao)
     {
-        this.workerDao = workerDao;
+        _workerDao = workerDao;
     }
     
     
@@ -22,23 +22,26 @@ public class WorkerLogic : IWorkerLogic
     {
         Worker worker = new Worker(toCreate.FirstName, toCreate.LastName, toCreate.PhoneNumber, toCreate.Mail,
             toCreate.Address);
-
-        Worker? exists = await workerDao.GetByFullNameAsync(worker.getFullName());
+        
+        ValidateWorker(worker);
+        
+        Worker? exists = await _workerDao.GetByFullNameAsync(worker.getFullName());
         if (exists == null)
         {
             throw new Exception("Worker already exists!");
         }
         
-        return await workerDao.CreateAsync(worker);
+        return await _workerDao.CreateAsync(worker);
     }
 
     public async Task<IEnumerable<Worker>> GetAsync(SearchWorkerParametersDto searchWorkerParametersDto)
     {
-       return await workerDao.GetAsync(searchWorkerParametersDto);
+       return await _workerDao.GetAsync(searchWorkerParametersDto);
     }
 
     private void ValidateWorker(Worker worker)
     {
+        //todo add unitTesting!
         ValidateName(worker.FirstName, worker.LastName);
         ValidatePhoneNumber(worker.PhoneNumber);
         ValidateMail(worker.Mail);
@@ -47,7 +50,7 @@ public class WorkerLogic : IWorkerLogic
 
     private void ValidateName(string firstName, string lastName)
     {
-        if (Regex.IsMatch(firstName, @"^[a-zA-Z]+$") && Regex.IsMatch(lastName, @"^[a-zA-Z]+$"))
+        if (!(Regex.IsMatch(firstName, @"^[a-zA-Z]+$") && Regex.IsMatch(lastName, @"^[a-zA-Z]+$")))
         {
             throw new Exception("Name may only contain letters");
         }
@@ -91,7 +94,7 @@ public class WorkerLogic : IWorkerLogic
             }
         }
 
-        if (Regex.IsMatch(temp.Last(), @"^[a-zA-Z0-9]+$"))
+        if (!Regex.IsMatch(temp.Last(), @"^[a-zA-Z0-9]+$"))
         {
             throw new Exception("Invalid address number");
         }
