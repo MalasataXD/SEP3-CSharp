@@ -11,4 +11,11 @@ public class Worker
     public string Address { get; set; }
     
     // TODO: Authentication
+
+
+    public string getFullName()
+    {
+        return FirstName + " " + LastName;
+    }
+    
 }
