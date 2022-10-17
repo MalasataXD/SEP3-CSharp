@@ -7,7 +7,7 @@ namespace Application.LogicInterfaces;
 
 public interface IWorkShiftLogic
 {
-    Task<WorkShift> CreateAsync(WorkShiftCreationDto shift); // ¤ Create (Post)
+    Task<WorkShift> CreateAsync(WorkShiftCreationDto toCreate); // ¤ Create (Post)
     Task<IEnumerable<WorkShift>> GetAsync(SearchShiftParametersDto searchParameters); // ¤ Get
     Task<WorkShift?> GetByIdAsync(int shiftId); // ¤ Get
     Task UpdateAsync(WorkShiftUpdateDto toUpdate); // ¤ Update (Patch)

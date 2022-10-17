@@ -3,7 +3,7 @@ using Domain.Models;
 
 namespace Application.DAOInterfaces;
 
-public interface IWorkShiftDAO
+public interface IWorkShiftDao
 {
     Task<WorkShift> CreateAsync(WorkShift shift); // ¤ Create (Post)
     Task<IEnumerable<WorkShift>> GetAsync(SearchShiftParametersDto searchParameters); // ¤ Get

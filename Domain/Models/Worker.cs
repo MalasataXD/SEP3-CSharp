@@ -12,6 +12,15 @@ public class Worker
     
     // TODO: Authentication
 
+    public Worker(string firstName, string lastName, string phone, string mail, string address)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Phone = phone;
+        Mail = mail;
+        Address = address;
+    }
+
 
     public string getFullName()
     {
