@@ -26,7 +26,7 @@ public class WorkerLogic : IWorkerLogic
         ValidateWorker(worker);
         
         Worker? exists = await _workerDao.GetByFullNameAsync(worker.getFullName());
-        if (exists == null)
+        if (exists != null)
         {
             throw new Exception("Worker already exists!");
         }

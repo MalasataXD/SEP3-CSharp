@@ -37,7 +37,7 @@ public class FileContext
         }
         
         // * Check if there is a file at the Filepath, then create a new DataContainer
-        if (File.Exists(FilePath))
+        if (!File.Exists(FilePath))
         {
             _dataContainer = new()
             {
@@ -57,7 +57,10 @@ public class FileContext
     // ¤ Save data to file (Temp)
     public void SaveChanges()
     {
-        string serialized = JsonSerializer.Serialize(_dataContainer);
+        string serialized = JsonSerializer.Serialize(_dataContainer,new JsonSerializerOptions
+        {
+            WriteIndented = true
+        });
         File.WriteAllText(FilePath,serialized);
         _dataContainer = null; // ! Reset data container!
     }

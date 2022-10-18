@@ -31,7 +31,7 @@ public class WorkerController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Could not create new user, something went wrong!");
+            Console.WriteLine(e);
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

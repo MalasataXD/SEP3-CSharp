@@ -1,0 +1,68 @@
+{
+  "Workers": [
+    {
+      "WorkerId": 1,
+      "FirstName": "Mads",
+      "LastName": "Hylleberg",
+      "PhoneNumber": 12345678,
+      "Mail": "Mail@mail.com",
+      "Address": "Vejnavn 1"
+    },
+    {
+      "WorkerId": 2,
+      "FirstName": "Mads",
+      "LastName": "Bobjerg",
+      "PhoneNumber": 12345678,
+      "Mail": "Mail2@mail.com",
+      "Address": "Vejnavn 2"
+    },
+    {
+      "WorkerId": 3,
+      "FirstName": "Marcus",
+      "LastName": "DePlace",
+      "PhoneNumber": 12345678,
+      "Mail": "Mail3@mail.com",
+      "Address": "Vejnavn 3"
+    },
+    {
+      "WorkerId": 4,
+      "FirstName": "Bjarke",
+      "LastName": "Breth",
+      "PhoneNumber": 12345678,
+      "Mail": "Mail4@mail.com",
+      "Address": "Vejnavn 4"
+    }
+  ],
+  "Shifts": [
+    {
+      "ShiftId": 1,
+      "Date": "16-10-2022",
+      "FromTime": "16:45",
+      "ToTime": "20:20",
+      "Worker": {
+        "WorkerId": 1,
+        "FirstName": "Mads",
+        "LastName": "Hylleberg",
+        "PhoneNumber": 12345678,
+        "Mail": "Mail@mail.com",
+        "Address": "Vejnavn 1"
+      },
+      "BreakAmount": "45 min"
+    },
+    {
+      "ShiftId": 2,
+      "Date": "16-10-2022",
+      "FromTime": "16:45",
+      "ToTime": "20:20",
+      "Worker": {
+        "WorkerId": 2,
+        "FirstName": "Mads",
+        "LastName": "Bobjerg",
+        "PhoneNumber": 12345678,
+        "Mail": "Mail2@mail.com",
+        "Address": "Vejnavn 2"
+      },
+      "BreakAmount": "45 min"
+    }
+  ]
+}
