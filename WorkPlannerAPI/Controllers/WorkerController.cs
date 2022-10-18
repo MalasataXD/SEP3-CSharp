@@ -37,6 +37,7 @@ public class WorkerController : ControllerBase
     }
     
     // ¤ Get Worker
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<Worker>>> GetAsync([FromQuery] string? workerName)
     {
         try
