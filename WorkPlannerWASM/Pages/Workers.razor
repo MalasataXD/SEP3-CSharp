@@ -1,0 +1,79 @@
+﻿@page "/Workers"
+@using Domain.Models
+@using HttpClients.Interfaces
+@inject IWorkerService WorkerService
+
+<h3 style="text-align: center">Overview of all workers</h3>
+
+                <label>Name:</label>
+                <input type="text" @bind="nameFilter"/>
+
+<div>
+    <button @onclick="LoadWorkers">Search</button>
+</div>
+
+@if (workers == null)
+{
+}
+else if (!workers.Any())
+{
+    <p>No Todos to display</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Mail</th>
+            <th>Phonenumber</th>
+            <th>Address</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var worker in workers)
+        {
+            <tr>
+                <td>@worker.getFullName()</td>
+                <td>@worker.Mail</td>
+                <td>@worker.PhoneNumber</td>
+                <td>@worker.Address</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@if (!string.IsNullOrEmpty(msg))
+{
+    <label style="color: red">@msg</label>
+}
+
+@code {
+    private IEnumerable<Worker>? workers;
+    private string msg = "";
+
+    private string? nameFilter;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWorkers();
+    }
+
+    private async Task LoadWorkers()
+    {
+        try
+        {
+            workers = await WorkerService.GetUsersAsync(nameFilter);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            msg = e.Message;
+        }
+    }
+    
+    
+    
+    
+}

@@ -51,7 +51,6 @@ public class WorkShiftController : ControllerBase
             Console.WriteLine("Could not find any user matching the criteria ");
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
-        
     }
     
     // ¤ Update WorkShift
