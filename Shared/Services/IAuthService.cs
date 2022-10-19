@@ -1,10 +1,11 @@
-﻿using Shared.Models;
+﻿using Shared.DTOs;
+using Shared.Models;
 
 namespace Shared.Services;
 
 public interface IAuthService
 {
-    Task<User> GetUser(string mail, string password);
-    Task RegisterUser(User user);
+    Task<User> GetUser(string mail);
+    Task RegisterUser(UserLoginCreationDto user);
     Task<User> ValidateUser(string mail, string password);
 }

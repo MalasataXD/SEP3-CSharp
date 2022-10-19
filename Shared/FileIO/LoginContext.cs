@@ -1,32 +1,24 @@
 ﻿using System.Text.Json;
-using Domain.Models;
+using Shared.Models;
 
-namespace FileData;
+namespace Shared.FileIO;
 
-public class FileContext
+public class LoginContext
 {
     // # Fields
-    private const string FilePath = "temp.json";
-    private DataContainer? _dataContainer;
+    private const string FilePath = "login.json";
+    private LoginDataContainer? _dataContainer;
     
     // ¤ Get Data
-    public ICollection<Worker> Workers
+    public ICollection<User> Users
     {
         get
         {
             LoadData();
-            return _dataContainer!.Workers;
+            return _dataContainer!.Users;
         }
     }
-    public ICollection<WorkShift> Shifts
-    {
-        get
-        {
-            LoadData();
-            return _dataContainer!.Shifts;
-        }
-    }
-    
+   
     // ¤ Extract Data from file (Temp)
     private void LoadData()
     {
@@ -41,15 +33,14 @@ public class FileContext
         {
             _dataContainer = new()
             {
-                Workers = new List<Worker>(),
-                Shifts = new List<WorkShift>()
+                Users = new List<User>(),
             };
             return;
         }
         
         // ! Extract content from file
         string content = File.ReadAllText(FilePath);
-        _dataContainer = JsonSerializer.Deserialize<DataContainer>(content);
+        _dataContainer = JsonSerializer.Deserialize<LoginDataContainer>(content);
 
 
     }

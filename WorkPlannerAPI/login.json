@@ -1,0 +1,10 @@
+{
+  "Users": [
+    {
+      "WorkerId": 1,
+      "Mail": "mads@fakemail.com",
+      "Password": "1234",
+      "Role": "Worker"
+    }
+  ]
+}
