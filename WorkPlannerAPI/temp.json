@@ -48,21 +48,6 @@
         "Address": "Vejnavn 1"
       },
       "BreakAmount": "45 min"
-    },
-    {
-      "ShiftId": 2,
-      "Date": "16-10-2022",
-      "FromTime": "16:45",
-      "ToTime": "20:20",
-      "Worker": {
-        "WorkerId": 2,
-        "FirstName": "Mads",
-        "LastName": "Bobjerg",
-        "PhoneNumber": 12345678,
-        "Mail": "Mail2@mail.com",
-        "Address": "Vejnavn 2"
-      },
-      "BreakAmount": "45 min"
     }
   ]
 }

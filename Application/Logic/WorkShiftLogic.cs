@@ -75,6 +75,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         string breakAmountToUse = toUpdate.BreakAmount ?? workShift.BreakAmount;
 
         WorkShift updatedWorkShift = new(dateToUse, fromTimeToUse, toTimeToUse, workerToUse, breakAmountToUse);
+        updatedWorkShift.ShiftId = workShift.ShiftId;
         await _WorkShiftDao.UpdateAsync(updatedWorkShift);
     }
 

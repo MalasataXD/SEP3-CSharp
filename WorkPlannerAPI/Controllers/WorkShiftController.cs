@@ -54,4 +54,40 @@ public class WorkShiftController : ControllerBase
         
     }
     
+    // ¤ Update WorkShift
+    [HttpPatch]
+    public async Task<ActionResult> UpdateAsync([FromBody] WorkShiftUpdateDto toUpdate)
+    {
+        try
+        {
+            await _workShiftLogic.UpdateAsync(toUpdate);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+    
+    // ¤ Delete WorkShift
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteAsync([FromRoute] int id)
+    {
+        try
+        {
+            await _workShiftLogic.DeleteAsync(id);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+
+
+
+
 }
