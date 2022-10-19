@@ -39,6 +39,17 @@ public class WorkerLogic : IWorkerLogic
        return await _workerDao.GetAsync(searchWorkerParametersDto);
     }
 
+    public async Task DeleteAsync(int workerId)
+    {
+        Worker? workShift = await _workerDao.GetByIdAsync(workerId);
+        if (workShift == null)
+        {
+            throw new Exception("Workshift does not exist!");
+        }
+
+        await _workerDao.DeleteAsync(workerId);
+    }
+
     private void ValidateWorker(Worker worker)
     {
         //todo add unitTesting!
@@ -47,7 +58,6 @@ public class WorkerLogic : IWorkerLogic
         ValidateMail(worker.Mail);
         ValidateAddress(worker.Address);
     }
-
     private void ValidateName(string firstName, string lastName)
     {
         if (!(Regex.IsMatch(firstName, @"^[a-zA-Z]+$") && Regex.IsMatch(lastName, @"^[a-zA-Z]+$")))
@@ -62,7 +72,6 @@ public class WorkerLogic : IWorkerLogic
             throw new Exception("Phonenumber needs to be 8 numbers long");
         }
     }
-    
     private void ValidateMail(string mail)
     {
         try
@@ -81,7 +90,6 @@ public class WorkerLogic : IWorkerLogic
             throw new Exception("Invalid mail");
         }
     }
-    
     private void ValidateAddress(string address)
     {
         string[] temp = address.Split(" ");

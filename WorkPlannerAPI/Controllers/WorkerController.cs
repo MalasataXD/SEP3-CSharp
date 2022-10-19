@@ -52,4 +52,23 @@ public class WorkerController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+    
+    // ¤ Delete Worker
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteAsync([FromRoute] int id)
+    {
+        try
+        {
+            await _workerLogic.DeleteAsync(id);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+    
+    
+    
 }

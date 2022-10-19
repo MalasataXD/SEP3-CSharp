@@ -23,14 +23,6 @@
       "PhoneNumber": 12345678,
       "Mail": "Mail3@mail.com",
       "Address": "Vejnavn 3"
-    },
-    {
-      "WorkerId": 4,
-      "FirstName": "Bjarke",
-      "LastName": "Breth",
-      "PhoneNumber": 12345678,
-      "Mail": "Mail4@mail.com",
-      "Address": "Vejnavn 4"
     }
   ],
   "Shifts": [

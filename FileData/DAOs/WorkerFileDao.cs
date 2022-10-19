@@ -80,4 +80,23 @@ public class WorkerFileDao : IWorkerDao
 
         return Task.FromResult(toFind);
     }
+    
+    // ¤ Delete Shift
+    public Task DeleteAsync(int workerId)
+    {
+        // * Check if a shift with the id exists
+        Worker? existing = _context.Workers.FirstOrDefault(worker => worker.WorkerId == workerId);
+        if (existing == null)
+        {
+            throw new Exception($"A Worker with id {workerId} does not exist!");
+        }
+        
+        // * Remove the existing
+        _context.Workers.Remove(existing);
+        
+        // * Save changes
+        _context.SaveChanges();
+
+        return Task.CompletedTask;
+    }
 }
