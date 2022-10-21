@@ -32,7 +32,7 @@ public class WorkerController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            return StatusCode(500, e.Message);
         }
     }
     

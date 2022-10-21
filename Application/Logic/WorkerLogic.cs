@@ -54,16 +54,27 @@ public class WorkerLogic : IWorkerLogic
     {
         //todo add unitTesting!
         ValidateName(worker.FirstName, worker.LastName);
-        ValidatePhoneNumber(worker.PhoneNumber);
         ValidateMail(worker.Mail);
+        ValidatePhoneNumber(worker.PhoneNumber);
         ValidateAddress(worker.Address);
     }
     private void ValidateName(string firstName, string lastName)
     {
-        if (!(Regex.IsMatch(firstName, @"^[a-zA-Z]+$") && Regex.IsMatch(lastName, @"^[a-zA-Z]+$")))
+        string[] lastNames = lastName.Split(" ");
+        
+        if (!Regex.IsMatch(firstName, @"^[a-zA-Z]+$"))
         {
-            throw new Exception("Name may only contain letters");
+            throw new Exception("Firstname may only contain letters");
         }
+
+        foreach (var name in lastNames)
+        {
+            if (!Regex.IsMatch(name, @"^[a-zA-Z]+$"))
+            {
+                throw new Exception("Lastname may only contain letters");
+            }
+        }
+        
     }
     private void ValidatePhoneNumber(int phoneNumber)
     {
@@ -92,6 +103,11 @@ public class WorkerLogic : IWorkerLogic
     }
     private void ValidateAddress(string address)
     {
+        if (!address.Contains(" "))
+        {
+            throw new Exception("Invalid address name");
+        }
+        
         string[] temp = address.Split(" ");
         
         for (int i = 0; i < temp.Length-1; i++)

@@ -17,12 +17,20 @@
       "Address": "Vejnavn 2"
     },
     {
-      "WorkerId": 3,
-      "FirstName": "Marcus",
-      "LastName": "DePlace",
+      "WorkerId": 4,
+      "FirstName": "Bjarke",
+      "LastName": "Pedersen",
       "PhoneNumber": 12345678,
-      "Mail": "Mail3@mail.com",
-      "Address": "Vejnavn 3"
+      "Mail": "yeet@mail.dk",
+      "Address": "yeetvej 44"
+    },
+    {
+      "WorkerId": 5,
+      "FirstName": "Marcus",
+      "LastName": "de Place",
+      "PhoneNumber": 12345678,
+      "Mail": "Mail@mail.com",
+      "Address": "vejvej 12"
     }
   ],
   "Shifts": [

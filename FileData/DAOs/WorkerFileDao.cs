@@ -81,7 +81,7 @@ public class WorkerFileDao : IWorkerDao
         return Task.FromResult(toFind);
     }
     
-    // ¤ Delete Shift
+    // ¤ Delete Worker
     public Task DeleteAsync(int workerId)
     {
         // * Check if a shift with the id exists

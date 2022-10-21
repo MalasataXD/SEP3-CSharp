@@ -1,7 +1,11 @@
 ﻿@page "/Workers"
 @using Domain.Models
 @using HttpClients.Interfaces
+@using UIComponents
+@using Domain.DTOs.Worker
+@using Domain.DTOs.SearchParameters
 @inject IWorkerService WorkerService
+@inject NavigationManager navMgr
 
 <h3 style="text-align: center">Overview of all workers</h3>
 
@@ -12,12 +16,19 @@
     <button @onclick="LoadWorkers">Search</button>
 </div>
 
+<div>
+    <button @onclick="ShowPopUp">Create</button>
+</div>
+
+
+
 @if (workers == null)
 {
+    <label>Loading users...</label>
 }
 else if (!workers.Any())
 {
-    <p>No Todos to display</p>
+    <p>No workers to display</p>
 }
 else
 {
@@ -28,6 +39,7 @@ else
             <th>Mail</th>
             <th>Phonenumber</th>
             <th>Address</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -38,23 +50,75 @@ else
                 <td>@worker.Mail</td>
                 <td>@worker.PhoneNumber</td>
                 <td>@worker.Address</td>
+                <td><button @onclick="@(() => DeleteWorker(worker.WorkerId))">DELETE</button></td>
             </tr>
         }
         </tbody>
     </table>
 }
+
 @if (!string.IsNullOrEmpty(msg))
 {
     <label style="color: red">@msg</label>
 }
 
+
+<PopUp ShowPopUp="showPopUp">
+
+
+        <button @onclick="@ClosePopUp">Exit</button>
+
+    
+    <div class="form-group field">
+        <label>First name:</label>
+        <input type="text" @bind="firstName"/>
+    </div>
+    
+    <div class="form-group field">
+        <label>Last name:</label>
+        <input type="text" @bind="LastName"/>
+    </div>
+    <div class="form-group field">
+        <label>Mail:</label>
+        <input type="text" @bind="Mail"/>
+    </div>
+    
+    <div class="form-group field">
+        <label>Phonenumber:</label>
+        <input type="text" @bind="PhoneNumber"/>
+    </div>
+    
+    <div class="form-group field">
+        <label>Adress:</label>
+        <input type="text" @bind="Address"/>
+    </div>    
+    
+    <button @onclick="@CreateWorker">Create Worker</button>
+    
+    @if (!string.IsNullOrEmpty(popUpMsg))
+    {
+        <label style="color: red">@popUpMsg</label>
+    }
+</PopUp>
+
+
 @code {
     private IEnumerable<Worker>? workers;
     private string msg = "";
+    private string popUpMsg = "";
 
     private string? nameFilter;
+    
+    private bool showPopUp;
 
 
+    //Create a worker text fields
+    private string firstName;
+    private string LastName;
+    private string PhoneNumber;
+    private string Mail;
+    private string Address;
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadWorkers();
@@ -64,13 +128,90 @@ else
     {
         try
         {
-            workers = await WorkerService.GetUsersAsync(nameFilter);
+            workers = await WorkerService.GetAsync(nameFilter);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             msg = e.Message;
         }
+    }
+
+    private void ShowPopUp()
+    {
+        firstName = "";
+        LastName = "";
+        PhoneNumber = "";
+        Mail = "";
+        Address = "";
+        showPopUp = true;
+    }
+
+    private void ClosePopUp()
+    {
+        showPopUp = false;
+        navMgr.NavigateTo("/Workers");
+    }
+    
+    private async Task CreateWorker()
+    {
+        
+        popUpMsg = "";
+        if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(LastName) || string.IsNullOrEmpty(PhoneNumber) || string.IsNullOrEmpty(Mail) || string.IsNullOrEmpty(Address))
+        {
+            popUpMsg = "Fields may not be empty";
+            return;
+        }
+
+        try
+        {
+            Int32.Parse(PhoneNumber);
+        }
+        catch (Exception e)
+        {
+            popUpMsg = "Phonenumber may only contain numbers";
+            return;
+        }
+        
+        try
+        {
+            WorkerCreationDto dto = new(firstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
+            Worker worker = await WorkerService.CreateAsync(dto);
+
+            var list = new List<Worker>(workers!);
+            list.Add(worker);
+            workers = list.AsEnumerable();
+            workers = await WorkerService.GetAsync(null);
+            
+            ClosePopUp();
+        }
+    catch (Exception e)
+        {
+            Console.WriteLine(e);
+            popUpMsg = e.Message;
+        }
+    }
+
+    private async Task DeleteWorker(int id)
+    {
+        msg = "";
+        try
+        {
+            await WorkerService.DeleteAsync(id);
+
+            var list = new List<Worker>(workers!);
+            list.RemoveAll(worker => worker.WorkerId == id);
+            workers = list.AsEnumerable();
+            
+            workers = await WorkerService.GetAsync(null);
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            msg = e.Message;
+        }
+        
     }
     
     

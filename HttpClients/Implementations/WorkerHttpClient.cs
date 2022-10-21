@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
 using Domain.DTOs.Worker;
 using Domain.Models;
 using HttpClients.Interfaces;
@@ -14,13 +15,20 @@ public class WorkerHttpClient : IWorkerService
         this.client = client;
     }
 
-    public Task<Worker> CreateAsync(WorkerCreationDto dto)
+    public async Task<Worker> CreateAsync(WorkerCreationDto dto)
     {
-        
-        throw new NotImplementedException();
+        HttpResponseMessage response = await client.PostAsJsonAsync("/worker", dto);
+        string result = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception(result);
+        }
+
+        Worker worker = JsonSerializer.Deserialize<Worker>(result)!;
+        return worker;    
     }
 
-    public async Task<IEnumerable<Worker>> GetUsersAsync(string? nameContains = null)
+    public async Task<IEnumerable<Worker>> GetAsync(string? nameContains = null)
     {
         string uri = "/worker";
         if (!string.IsNullOrEmpty(nameContains))
@@ -39,5 +47,15 @@ public class WorkerHttpClient : IWorkerService
             PropertyNameCaseInsensitive = true
         })!;
         return workers;
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        HttpResponseMessage response = await client.DeleteAsync($"Worker/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }    
     }
 }
