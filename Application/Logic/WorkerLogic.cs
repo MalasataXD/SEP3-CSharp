@@ -62,14 +62,14 @@ public class WorkerLogic : IWorkerLogic
     {
         string[] lastNames = lastName.Split(" ");
         
-        if (!Regex.IsMatch(firstName, @"^[a-zA-Z]+$"))
+        if (!Regex.IsMatch(firstName, @"^[a-åA-Å]+$"))
         {
             throw new Exception("Firstname may only contain letters");
         }
 
         foreach (var name in lastNames)
         {
-            if (!Regex.IsMatch(name, @"^[a-zA-Z]+$"))
+            if (!Regex.IsMatch(name, @"^[a-åA-Å]+$"))
             {
                 throw new Exception("Lastname may only contain letters");
             }

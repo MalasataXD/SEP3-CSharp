@@ -1,6 +1,7 @@
 ﻿using Application.DAOInterfaces;
 using Domain.DTOs.SearchParameters;
 using Domain.Models;
+using RabbitMQ;
 
 namespace FileData.DAOs;
 
@@ -8,7 +9,7 @@ public class WorkerFileDao : IWorkerDao
 {
     // # Fields
     private readonly FileContext _context;
-    
+
     // ¤ Constructor
     public WorkerFileDao(FileContext context)
     {
@@ -26,7 +27,7 @@ public class WorkerFileDao : IWorkerDao
             workerId = _context.Workers.Max(u => u.WorkerId);
             workerId++;
         }
-
+        Sender.SendWorker(worker);
         // * Assign Worker the correct Id
         worker.WorkerId = workerId;
         

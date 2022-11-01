@@ -31,6 +31,30 @@
       "PhoneNumber": 12345678,
       "Mail": "Mail@mail.com",
       "Address": "vejvej 12"
+    },
+    {
+      "WorkerId": 6,
+      "FirstName": "Mads",
+      "LastName": "Nielsen",
+      "PhoneNumber": 93608044,
+      "Mail": "mail@mail.com",
+      "Address": "vejnavn 1"
+    },
+    {
+      "WorkerId": 7,
+      "FirstName": "Joergen",
+      "LastName": "Nielsen",
+      "PhoneNumber": 12345678,
+      "Mail": "mail@mail.com",
+      "Address": "vejnavn 4"
+    },
+    {
+      "WorkerId": 8,
+      "FirstName": "\u00C5se",
+      "LastName": "Nielsen",
+      "PhoneNumber": 12345678,
+      "Mail": "mail@mail.com",
+      "Address": "vejnavn 97"
     }
   ],
   "Shifts": [
