@@ -31,8 +31,7 @@ public class VagtOperations
         var reply = client.fjernVagt(input);
 
         //WriteLine command for diagnostics
-        Console.WriteLine($"Message: {reply.ResponseMessage}" +
-                          $" code: {reply.ResponseCode}");
+        Console.WriteLine($"Message: {reply.ResponseMessage}" + $" code: {reply.ResponseCode}");
 
         //ReadLine command to prevent the client connection to server from closing until user input
         Console.ReadLine();
@@ -88,4 +87,27 @@ public class VagtOperations
         //ReadLine command to prevent the client connection to server from closing until user input
         Console.ReadLine();
     }
+    
+    public void OpretMedarbejder(string firstName, string lastName, string mail, string phoneNumber, string address)
+    {
+        
+        var input = new OpretMedarbejderRequest()
+        {
+            Address = address,
+            FirstName = firstName,
+            LastName = lastName,
+            Mail = mail,
+            PhoneNumber = phoneNumber
+        };
+
+        var client = new DatabaseOperationService.DatabaseOperationServiceClient(channel);
+
+        var reply = client.opretMedarbejder(input);
+        Console.WriteLine($"Message: {reply.ResponseMessage}" +
+                          $" code: {reply.ResponseCode}");
+        
+        //ReadLine command to prevent the client connection to server from closing until user input
+        Console.ReadLine();
+    }
+    
 }

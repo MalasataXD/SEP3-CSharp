@@ -1,6 +1,7 @@
 ﻿using Application.DAOInterfaces;
 using Domain.DTOs.SearchParameters;
 using Domain.Models;
+using gRPCClient.DatabaseOperations;
 
 namespace FileData.DAOs;
 
@@ -8,11 +9,13 @@ public class WorkerFileDao : IWorkerDao
 {
     // # Fields
     private readonly FileContext _context;
+    private readonly VagtOperations vagtOperations;
     
     // ¤ Constructor
     public WorkerFileDao(FileContext context)
     {
         _context = context;
+        vagtOperations = new VagtOperations("http://localhost:9090");
     }
     
     // ¤ Create new Worker
@@ -27,6 +30,7 @@ public class WorkerFileDao : IWorkerDao
             workerId++;
         }
 
+        vagtOperations.OpretMedarbejder(worker.FirstName,worker.LastName,worker.Mail,worker.PhoneNumber.ToString(),worker.Address);
         // * Assign Worker the correct Id
         worker.WorkerId = workerId;
         

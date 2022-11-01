@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\gRPCClient\gRPCClient.csproj" />
     </ItemGroup>
 
 </Project>
