@@ -1,0 +1,289 @@
+﻿@page "/WorkShifts"
+@using UIComponents
+
+@inject IWorkerService WorkerService
+@inject IWorkShiftService WorkShiftService
+@inject NavigationManager navMgr
+
+
+@using Domain.Models
+@using HttpClients.Interfaces
+@using Domain.DTOs.WorkShift
+@using System.Globalization
+<h3>WorkShifts</h3>
+
+@if (workers == null)
+{
+    <p>You have no workers</p>
+}
+
+@if (workers != null)
+{
+    <div class="form-group field">
+        <label>Worker:</label>
+        <select @bind-value="selectedUserId" @onchange="UpdateSchema" @bind-value:event="oninput">
+            @foreach (Worker worker in workers)
+            {
+                <option value="@worker.WorkerId">@worker.getFullName()</option>
+            }
+        </select>
+    </div>
+    
+    @if (selectedUserId == 0)
+    {
+        <div>
+            <button disabled @onclick="ShowPopUp">Create</button>
+        </div>
+    }
+    else
+    {
+        <div>
+            <button @onclick="ShowPopUp">Create</button>
+        </div>
+    }
+    
+    
+    <table>
+        <tr>
+            <td>Time</td>
+            @for (int i = 0; i < 7; i++)
+            {
+                <td style="text-align: center">@dateTime.DayOfWeek @dateTime.Day</td>
+                dateTime = dateTime.AddDays(1);
+            }
+            @if (true)
+            {
+                dateTime = dateTime.AddDays(-7);
+            }
+        </tr>
+        
+        <tr>
+            <td>
+                <table class="noBorder">
+                    @for (int i = 0; i < 24; i++)
+                    {
+                        if (i < 10)
+                        {
+                            <tr class="onlyBorderBottom">
+                                <td class="noBorder">0@{@i}:00</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="onlyBorderBottom">
+                                <td class="noBorder">@i:00</td>
+                            </tr> 
+                        }
+                        }
+                </table>
+            </td>
+            
+            @if (selectedUserId != 0 && _mondayWorkShifts != null)
+            {
+                <td>
+                    @foreach (WorkShift workShift in _mondayWorkShifts)
+                    {
+                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    }
+                </td>
+                <td>
+                    @foreach (WorkShift workShift in _tuesdayWorkShifts)
+                    {
+                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    }                    
+                </td>
+                <td>
+                    @foreach (WorkShift workShift in _wednesdayWorkShifts)
+                    {
+                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    }                    
+                </td>
+                <td>
+                    @foreach (WorkShift workShift in _thursdayWorkShifts)
+                    {
+                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    }                    
+                </td>
+                <td>
+                    @foreach (WorkShift workShift in _fridayWorkShifts)
+                    {
+                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    }                    
+                </td>
+                <td>
+                    @foreach (WorkShift workShift in _saturdayWorkShifts)
+                    {
+                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    }                    
+                </td>
+                <td>
+                    @foreach (WorkShift workShift in _sundayWorkShifts)
+                    {
+                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    }                    
+                </td>
+            }
+        </tr>
+    </table>
+    
+    
+    <PopUp ShowPopUp="showPopUp">
+        
+        <button @onclick="@ClosePopUp">Exit</button>
+    
+        <div class="form-group field">
+            <label>Date:</label>
+            <input type="text" @bind="date"/>
+        </div>
+    
+        <div class="form-group field">
+            <label>From Time:</label>
+            <input type="text" @bind="fromTime"/>
+        </div>
+        <div class="form-group field">
+            <label>To Time:</label>
+            <input type="text" @bind="toTime"/>
+        </div>
+    
+        <div class="form-group field">
+            <label>Break Amount:</label>
+            <input type="text" @bind="breakAmount"/>
+        </div>
+    
+        <button @onclick="@CreateWorkShift">Create WorkShift</button>
+    
+        @if (!string.IsNullOrEmpty(popUpMsg))
+        {
+            <label style="color: red">@popUpMsg</label>
+        }
+    </PopUp>
+
+}
+
+
+
+@code {
+
+    private int selectedUserId = 0;
+
+    private IEnumerable<Worker>? workers;
+    private IEnumerable<WorkShift>? workShifts;
+    private string msg = "";
+    private string popUpMsg = "";
+    private bool showPopUp;
+
+    private string? nameFilter;
+
+    private string date;
+    private string fromTime;
+    private string toTime;
+    private string breakAmount;
+    
+    private DateTime dateTime = DateTime.Today;
+    private int weekNumber;
+    private int year;
+
+    //should be deleteable if call async method in body
+    //other alternative array in array?
+    private IEnumerable<WorkShift>? _mondayWorkShifts;
+    private IEnumerable<WorkShift>? _tuesdayWorkShifts;
+    private IEnumerable<WorkShift>? _wednesdayWorkShifts;
+    private IEnumerable<WorkShift>? _thursdayWorkShifts;
+    private IEnumerable<WorkShift>? _fridayWorkShifts;
+    private IEnumerable<WorkShift>? _saturdayWorkShifts;
+    private IEnumerable<WorkShift>? _sundayWorkShifts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWorkers();
+        
+        while (dateTime.DayOfWeek != DayOfWeek.Monday)
+        {
+            dateTime = dateTime.AddDays(-1);
+        }
+
+        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        year = dateTime.Year;
+    }
+
+    private async Task UpdateSchema()
+    {
+        _mondayWorkShifts = await GetWorkShifts(0);
+        _tuesdayWorkShifts = await GetWorkShifts(1);
+        _wednesdayWorkShifts = await GetWorkShifts(2);
+        _thursdayWorkShifts = await GetWorkShifts(3);
+        _fridayWorkShifts = await GetWorkShifts(4);
+        _saturdayWorkShifts = await GetWorkShifts(5);
+        _sundayWorkShifts = await GetWorkShifts(6);
+    }
+    
+    private async Task LoadWorkers()
+    {
+        try
+        {
+            workers = await WorkerService.GetAsync(nameFilter);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            msg = e.Message;
+        }
+    }
+    
+    
+    private async Task CreateWorkShift()
+    {
+        popUpMsg = "";
+        if (string.IsNullOrEmpty(date) || string.IsNullOrEmpty(fromTime) || string.IsNullOrEmpty(toTime) || string.IsNullOrEmpty(breakAmount))
+        {
+            popUpMsg = "Fields may not be empty";
+            return;
+        }
+        
+        try
+        {
+            WorkShiftCreationDto dto = new(date, fromTime, toTime, selectedUserId ,breakAmount);
+
+            WorkShift workShift = await WorkShiftService.CreateAsync(dto);
+            
+            //todo add workshift to schema
+            
+            ClosePopUp();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            popUpMsg = e.Message;
+        }
+    }
+
+    private async Task<IEnumerable<WorkShift>> GetWorkShifts(int dayNumber)
+    {
+
+        DateTime dt = dateTime;
+        dt = dt.AddDays(dayNumber);
+
+        string date = $"{dt.Day}-{dt.Month}-{dt.Year}";
+
+        Worker worker = workers.FirstOrDefault(w => w.WorkerId == selectedUserId);
+     // Worker worker = WorkerService.GetByIdAsync();
+        
+
+       return workShifts = await WorkShiftService.GetAsync(date, worker.getFullName());
+    }
+    
+    
+    private void ShowPopUp()
+    {
+        showPopUp = true;
+    }
+    
+    private void ClosePopUp()
+    {
+        showPopUp = false;
+        navMgr.NavigateTo("/WorkShifts");
+    }
+    
+    
+    
+}

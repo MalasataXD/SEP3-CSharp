@@ -27,10 +27,10 @@ public class WorkShiftLogic : IWorkShiftLogic
             throw new Exception("Worker does not exist!");
         }
 
-        WorkShift workShift = new(toCreate.Date, toCreate.ToTime, toCreate.FromTime, worker, toCreate.BreakAmount);
-
-        ValidateWorkShift(workShift);
-     
+        WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount);
+        
+        await ValidateWorkShift(workShift);
+            
         return await _WorkShiftDao.CreateAsync(workShift);
     }
 
@@ -89,15 +89,16 @@ public class WorkShiftLogic : IWorkShiftLogic
     }
 
 
-    private void ValidateWorkShift(WorkShift workShift)
+    private async Task ValidateWorkShift(WorkShift workShift)
     {
         //todo check for absence
         //todo add unitTesting!
         ValidateDate(workShift.Date);
-        ValidateTime(workShift.FromTime);
+        ValidateTime(workShift.FromTime); 
         ValidateTime(workShift.ToTime);
         ValidateTimes(workShift.FromTime, workShift.ToTime);
-        IsWorkerOccupied(workShift.Worker.getFullName(), workShift.Date, workShift.FromTime, workShift.ToTime);
+        IEnumerable<WorkShift> shifts = await _WorkShiftDao.GetAsync(new SearchShiftParametersDto(workShift.Date,null));
+        IsWorkerOccupied(workShift.Worker.WorkerId, workShift.Date, workShift.FromTime, workShift.ToTime,shifts);
     }
 
     private void ValidateDate(string date)
@@ -105,78 +106,95 @@ public class WorkShiftLogic : IWorkShiftLogic
         string[] temp = date.Split("/");
         
         // todo add methods: how many days in month + isLeapYear + more??
-        // ? make date class ?
+        // ? prob use DateTime class ?
     }
 
     private void ValidateTime(string time)
     {
+
         try
         {
-            char[] temp = time.ToCharArray();
+            string[] timeSplit = time.Split(":", 2);
         
-            int timeHour = temp[0] * 10 + temp[1];
-            int timeMinute = temp[3] * 10 + temp[4];
-
-            if (!(temp[2].ToString().Equals(":") && time.Length == 5))
+            if (timeSplit[0].Length != 2 && timeSplit[1].Length != 2)
             {
-                throw new Exception("Invalid timeformat");
+                throw new Exception("Invalid time format");
+            }
+
+            if (Int32.Parse(timeSplit[0].TrimStart('0')) is < 0 and <= 23)
+            {
+                throw new Exception("Invalid hour");
             }
             
-            if (!(timeHour is >= 0 and <= 23))
+            if (Int32.Parse(timeSplit[1]) is < 0 and <= 59)
             {
-                throw new Exception("Invalid time");
-            }
-
-            if (!(timeMinute is >= 0 and <= 59))
-            {
-                throw new Exception("Invalid time");
+                throw new Exception("Invalid minute");
             }
         }
         catch (Exception e)
         {
-            throw new Exception("Invalid timeformat");
+            throw new Exception("Invalid time format");
         }
+        
+
     }
 
     private void ValidateTimes(string fromTime, string toTime)
     {
         if (TimeToMinutes(fromTime) >= TimeToMinutes(toTime))
         {
-            throw new Exception("fromTime has to be before toTime");
+            throw new Exception($"{fromTime} {toTime} fromTime has to be before toTime");
         }
     }
 
-    private async void IsWorkerOccupied(string fullName, string date, string fromTime, string toTime)
+    private void IsWorkerOccupied(int id, string date, string fromTime, string toTime,IEnumerable<WorkShift>  shifts)
     {
-        SearchShiftParametersDto dto = new (date, fullName);
-        IEnumerable<WorkShift> workShifts = await _WorkShiftDao.GetAsync(dto);
-
+        SearchShiftParametersDto dto = new (date,null);
+        IEnumerable<WorkShift> workShifts = shifts;
         int fromTimeMinutes = TimeToMinutes(fromTime);
         int toTimeMinutes = TimeToMinutes(toTime);
+        Boolean throwExeception = false;
+        WorkShift foundShift = null;
+        
         
         foreach (var workShift in workShifts)
         {
-            if (fromTimeMinutes <= TimeToMinutes(workShift.FromTime) && TimeToMinutes(workShift.FromTime) <= toTimeMinutes)
+            if (id == workShift.Worker.WorkerId)
             {
-                throw new Exception($"{fullName} already has a shift at that time!");
-            }
+                if (fromTimeMinutes <= TimeToMinutes(workShift.FromTime) && TimeToMinutes(workShift.FromTime) <= toTimeMinutes)
+                {
+                    throwExeception = true;
+                    foundShift = workShift;
+                    break;
+                }
 
-            if (fromTimeMinutes <= TimeToMinutes(workShift.ToTime) && TimeToMinutes(workShift.ToTime) <= toTimeMinutes)
-            {
-                throw new Exception($"{fullName} already has a shift at that time!");
-            }
+                if (fromTimeMinutes <= TimeToMinutes(workShift.ToTime) && TimeToMinutes(workShift.ToTime) <= toTimeMinutes)
+                {
+                    throwExeception = true;
+                    foundShift = workShift;
+                    break;
+                }
 
-            if (TimeToMinutes(workShift.FromTime) <= fromTimeMinutes && toTimeMinutes <= TimeToMinutes(workShift.ToTime))
-            {
-                throw new Exception($"{fullName} already has a shift at that time!");
+                if (TimeToMinutes(workShift.FromTime) <= fromTimeMinutes && toTimeMinutes <= TimeToMinutes(workShift.ToTime))
+                {
+                    throwExeception = true;
+                    foundShift = workShift;
+                    break;
+                }
             }
         }
+
+        if (throwExeception)
+        {
+            throw new Exception($"{foundShift.Worker.getFullName()} already has a shift at that time!");
+        }
+        
     }
 
     private int TimeToMinutes(string time)
     {
-        char[] temp = time.ToCharArray();
+        string[] temp = time.Split(":");
 
-        return temp[0] * 600 + temp[1] * 60 + temp[3] * 10 + temp[4];
+        return Int32.Parse(temp[0]) * 60 + Int32.Parse(temp[1]);
     }
 }

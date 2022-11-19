@@ -9,5 +9,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7215") });
 builder.Services.AddScoped<IWorkerService, WorkerHttpClient>();
+builder.Services.AddScoped<IWorkShiftService, WorkShiftHttpClient>();
 
 await builder.Build().RunAsync();

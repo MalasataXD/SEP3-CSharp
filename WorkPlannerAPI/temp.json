@@ -55,12 +55,20 @@
       "PhoneNumber": 12345678,
       "Mail": "mail@mail.com",
       "Address": "vejnavn 97"
+    },
+    {
+      "WorkerId": 9,
+      "FirstName": "Verylongname",
+      "LastName": "ultra long name",
+      "PhoneNumber": 12345678,
+      "Mail": "long@long.dk",
+      "Address": "long 12"
     }
   ],
   "Shifts": [
     {
       "ShiftId": 1,
-      "Date": "16-10-2022",
+      "Date": "14-11-2022",
       "FromTime": "16:45",
       "ToTime": "20:20",
       "Worker": {
@@ -72,6 +80,66 @@
         "Address": "Vejnavn 1"
       },
       "BreakAmount": "45 min"
+    },
+    {
+      "ShiftId": 2,
+      "Date": "15-11-2022",
+      "FromTime": "16:45",
+      "ToTime": "20:45",
+      "Worker": {
+        "WorkerId": 1,
+        "FirstName": "Mads",
+        "LastName": "Hylleberg",
+        "PhoneNumber": 12345678,
+        "Mail": "Mail@mail.com",
+        "Address": "Vejnavn 1"
+      },
+      "BreakAmount": "45 min"
+    },
+    {
+      "ShiftId": 3,
+      "Date": "15-11-2022",
+      "FromTime": "16:45",
+      "ToTime": "20:45",
+      "Worker": {
+        "WorkerId": 2,
+        "FirstName": "Mads",
+        "LastName": "Bobjerg",
+        "PhoneNumber": 12345678,
+        "Mail": "Mail2@mail.com",
+        "Address": "Vejnavn 2"
+      },
+      "BreakAmount": "45 min"
+    },
+    {
+      "ShiftId": 4,
+      "Date": "17-11-2022",
+      "FromTime": "12:20",
+      "ToTime": "18:45",
+      "Worker": {
+        "WorkerId": 2,
+        "FirstName": "Mads",
+        "LastName": "Bobjerg",
+        "PhoneNumber": 12345678,
+        "Mail": "Mail2@mail.com",
+        "Address": "Vejnavn 2"
+      },
+      "BreakAmount": "60 min"
+    },
+    {
+      "ShiftId": 5,
+      "Date": "18-11-2022",
+      "FromTime": "10:10",
+      "ToTime": "20:00",
+      "Worker": {
+        "WorkerId": 1,
+        "FirstName": "Mads",
+        "LastName": "Hylleberg",
+        "PhoneNumber": 12345678,
+        "Mail": "Mail@mail.com",
+        "Address": "Vejnavn 1"
+      },
+      "BreakAmount": "60 min"
     }
   ]
 }

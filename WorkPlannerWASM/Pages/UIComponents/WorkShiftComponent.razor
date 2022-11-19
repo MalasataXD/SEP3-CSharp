@@ -1,0 +1,24 @@
+﻿@namespace UIComponents
+
+<div class="card">
+
+    <p>Date: @date</p>
+    <p>Time: @fromTime - @toTime</p>
+    <p>Break: @BreakAmount</p>
+    
+</div>
+
+@code {
+    [Parameter] 
+    public string date { get; set; }
+    
+    [Parameter] 
+    public string fromTime { get; set; }
+    
+    [Parameter] 
+    public string toTime { get; set; }  
+    
+    [Parameter] 
+    public string BreakAmount { get; set; }   
+    
+}

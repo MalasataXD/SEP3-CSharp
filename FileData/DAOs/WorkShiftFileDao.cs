@@ -44,14 +44,12 @@ public class WorkShiftFileDao : IWorkShiftDao
 
         if (!string.IsNullOrEmpty(searchParameters.Date))
         {
-            result = _context.Shifts.Where(shift =>
-                shift.Date.Equals(searchParameters.Date, StringComparison.OrdinalIgnoreCase));
+            result = _context.Shifts.Where(shift => shift.Date.Equals(searchParameters.Date));
         }
         
         if (!string.IsNullOrEmpty(searchParameters.WorkerName))
         {
-            result = _context.Shifts.Where(shift =>
-                shift.Date.Equals(searchParameters.Date, StringComparison.OrdinalIgnoreCase));
+            result = result.Where(shift => shift.Worker.getFullName().Contains(searchParameters.WorkerName, StringComparison.OrdinalIgnoreCase));
         }
         return Task.FromResult(result);
     }
