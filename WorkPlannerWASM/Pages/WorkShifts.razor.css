@@ -18,3 +18,7 @@ td {
     border:0;
     border-bottom: 1px solid black;
 }
+
+.btn-group button {
+    float: left; 
+}

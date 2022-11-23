@@ -41,8 +41,21 @@
             <button @onclick="ShowPopUp">Create</button>
         </div>
     }
-    
-    
+
+    <div class="btn-group">
+        <button @onclick="@(e => UpdateDate(-1,0))">-</button>
+        <h5>Uge: @weekNumber</h5>
+        <button @onclick="@(e => UpdateDate(1, 0))">+</button>
+    </div>
+    <div class="btn-group">
+        <button @onclick="@(e => UpdateDate(0,-1))">-</button>
+        <h5>Year: @year</h5>
+        <button @onclick="@(e => UpdateDate(0, 1))">+</button>
+    </div>
+
+
+
+
     <table>
         <tr>
             <td>Time</td>
@@ -78,7 +91,7 @@
                 </table>
             </td>
             
-            @if (selectedUserId != 0 && _mondayWorkShifts != null)
+            @if (selectedUserId != 0 && _sundayWorkShifts != null)
             {
                 <td>
                     @foreach (WorkShift workShift in _mondayWorkShifts)
@@ -183,8 +196,8 @@
     private int weekNumber;
     private int year;
 
-    //should be deleteable if call async method in body
-    //other alternative array in array?
+    // should be deleteable if call async method in body
+    // other alternative array in array?
     private IEnumerable<WorkShift>? _mondayWorkShifts;
     private IEnumerable<WorkShift>? _tuesdayWorkShifts;
     private IEnumerable<WorkShift>? _wednesdayWorkShifts;
@@ -195,17 +208,17 @@
 
     protected override async Task OnInitializedAsync()
     {
+        
         await LoadWorkers();
         
         while (dateTime.DayOfWeek != DayOfWeek.Monday)
         {
             dateTime = dateTime.AddDays(-1);
         }
-
-        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-        year = dateTime.Year;
+          weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+          year = dateTime.Year;
     }
-
+    
     private async Task UpdateSchema()
     {
         _mondayWorkShifts = await GetWorkShifts(0);
@@ -272,6 +285,16 @@
        return workShifts = await WorkShiftService.GetAsync(date, worker.getFullName());
     }
     
+    private async Task UpdateDate(int weekNumberChange, int yearChange)
+    {
+        dateTime = dateTime.AddDays(weekNumberChange * 7);
+        dateTime = dateTime.AddYears(yearChange);
+        
+        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        year = dateTime.Year;
+        
+        await UpdateSchema();
+    }
     
     private void ShowPopUp()
     {
@@ -283,7 +306,4 @@
         showPopUp = false;
         navMgr.NavigateTo("/WorkShifts");
     }
-    
-    
-    
 }
