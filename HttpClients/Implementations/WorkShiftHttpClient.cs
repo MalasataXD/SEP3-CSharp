@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using Domain.DTOs.WorkShift;
 using Domain.Models;
@@ -62,4 +63,26 @@ public class WorkShiftHttpClient : IWorkShiftService
         })!;
         return workShifts;
     }
+    
+    public async Task UpdateAsync(WorkShiftUpdateDto dto)
+    {
+        string dtoAsJson = JsonSerializer.Serialize(dto);
+        StringContent body = new StringContent(dtoAsJson, Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response = await client.PatchAsync("/workShift", body);
+        if (!response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

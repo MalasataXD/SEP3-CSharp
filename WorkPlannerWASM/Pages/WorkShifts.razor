@@ -10,6 +10,7 @@
 @using HttpClients.Interfaces
 @using Domain.DTOs.WorkShift
 @using System.Globalization
+@using System.Collections
 <h3>WorkShifts</h3>
 
 @if (workers == null)
@@ -32,28 +33,27 @@
     @if (selectedUserId == 0)
     {
         <div>
-            <button disabled @onclick="ShowPopUp">Create</button>
+            <button disabled @onclick="ShowCreatePopUp">Create</button>
         </div>
     }
     else
     {
         <div>
-            <button @onclick="ShowPopUp">Create</button>
+            <button @onclick="ShowCreatePopUp">Create</button>
         </div>
     }
 
     <div class="btn-group">
-        <button @onclick="@(e => UpdateDate(-1,0))">-</button>
-        <h5>Uge: @weekNumber</h5>
+        <h5>Date: @dateTime.Day-@dateTime.Month-@dateTime.Year   </h5>
+        <button @onclick="@(e => UpdateDate(-1, 0))">-</button>
+        <h5 style="float: left">Uge: @weekNumber</h5>
         <button @onclick="@(e => UpdateDate(1, 0))">+</button>
     </div>
-    <div class="btn-group">
-        <button @onclick="@(e => UpdateDate(0,-1))">-</button>
-        <h5>Year: @year</h5>
-        <button @onclick="@(e => UpdateDate(0, 1))">+</button>
+    <div style="float: left">
+        <button style="float: left" @onclick="@(e => UpdateDate(0,-1))">-</button>
+        <h5 style="float: left">Year: @year</h5>
+        <button  @onclick="@(e => UpdateDate(0, 1))">+</button>
     </div>
-
-
 
 
     <table>
@@ -96,43 +96,58 @@
                 <td>
                     @foreach (WorkShift workShift in _mondayWorkShifts)
                     {
-                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                        <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(),workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                         <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                        </button>
                     }
                 </td>
                 <td>
                     @foreach (WorkShift workShift in _tuesdayWorkShifts)
                     {
-                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                        @* @onclick="@(e => UpdateDate(0,-1))" *@
+                    <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(),workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                    <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    </button>
                     }                    
                 </td>
                 <td>
                     @foreach (WorkShift workShift in _wednesdayWorkShifts)
                     {
-                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(),workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                    <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    </button>
                     }                    
                 </td>
                 <td>
                     @foreach (WorkShift workShift in _thursdayWorkShifts)
                     {
-                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                        <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(),workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                    <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    </button>
                     }                    
                 </td>
                 <td>
                     @foreach (WorkShift workShift in _fridayWorkShifts)
                     {
-                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                        <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(),workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                    <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    </button>
                     }                    
                 </td>
                 <td>
                     @foreach (WorkShift workShift in _saturdayWorkShifts)
                     {
-                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                        <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(),workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                    <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    </button>
                     }                    
                 </td>
                 <td>
                     @foreach (WorkShift workShift in _sundayWorkShifts)
                     {
-                        <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                        <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(),workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                    <WorkShiftComponent date="@workShift.Date" fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
+                    </button>
                     }                    
                 </td>
             }
@@ -140,9 +155,9 @@
     </table>
     
     
-    <PopUp ShowPopUp="showPopUp">
+    <PopUp ShowPopUp="showCreatePopUp">
         
-        <button @onclick="@ClosePopUp">Exit</button>
+        <button @onclick="@CloseCreatePopUp">Exit</button>
     
         <div class="form-group field">
             <label>Date:</label>
@@ -170,6 +185,46 @@
             <label style="color: red">@popUpMsg</label>
         }
     </PopUp>
+    
+    <PopUp ShowPopUp="showWorkShiftPopUp">
+        
+        <button @onclick="@CloseWorkShiftPopUp">Exit</button>
+    
+        <div class="form-group field">
+            <label>ShiftId:</label>
+            <input type="text" @bind="shiftId"/>
+        </div>
+        
+        <div class="form-group field">
+            <label>WorkerId:</label>
+            <input type="text" @bind="workerId"/>
+        </div>
+                <div class="form-group field">
+                    <label>Date:</label>
+                    <input type="text" @bind="date"/>
+                </div>
+            
+                <div class="form-group field">
+                    <label>From Time:</label>
+                    <input type="text" @bind="fromTime"/>
+                </div>
+                <div class="form-group field">
+                    <label>To Time:</label>
+                    <input type="text" @bind="toTime"/>
+                </div>
+            
+                <div class="form-group field">
+                    <label>Break Amount:</label>
+                    <input type="text" @bind="breakAmount"/>
+                </div>
+        
+        <button @onclick="UpdateWorkShift">Update WorkShift</button>
+    
+        @if (!string.IsNullOrEmpty(popUpMsg))
+        {
+            <label style="color: red">@popUpMsg</label>
+        }
+    </PopUp>
 
 }
 
@@ -183,14 +238,18 @@
     private IEnumerable<WorkShift>? workShifts;
     private string msg = "";
     private string popUpMsg = "";
-    private bool showPopUp;
+    private bool showCreatePopUp;
+    private bool showWorkShiftPopUp;
 
     private string? nameFilter;
 
+    //Create PopUp textfields
     private string date;
     private string fromTime;
     private string toTime;
     private string breakAmount;
+    private string shiftId;
+    private string workerId;
     
     private DateTime dateTime = DateTime.Today;
     private int weekNumber;
@@ -198,6 +257,7 @@
 
     // should be deleteable if call async method in body
     // other alternative array in array?
+
     private IEnumerable<WorkShift>? _mondayWorkShifts;
     private IEnumerable<WorkShift>? _tuesdayWorkShifts;
     private IEnumerable<WorkShift>? _wednesdayWorkShifts;
@@ -208,7 +268,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
         await LoadWorkers();
         
         while (dateTime.DayOfWeek != DayOfWeek.Monday)
@@ -228,6 +287,8 @@
         _fridayWorkShifts = await GetWorkShifts(4);
         _saturdayWorkShifts = await GetWorkShifts(5);
         _sundayWorkShifts = await GetWorkShifts(6);
+        
+        
     }
     
     private async Task LoadWorkers()
@@ -259,9 +320,11 @@
 
             WorkShift workShift = await WorkShiftService.CreateAsync(dto);
             
-            //todo add workshift to schema
+            //todo add workshift to schema without calling webapi
+            await UpdateSchema();
             
-            ClosePopUp();
+            
+            CloseCreatePopUp();
         }
         catch (Exception e)
         {
@@ -272,7 +335,6 @@
 
     private async Task<IEnumerable<WorkShift>> GetWorkShifts(int dayNumber)
     {
-
         DateTime dt = dateTime;
         dt = dt.AddDays(dayNumber);
 
@@ -280,9 +342,8 @@
 
         Worker worker = workers.FirstOrDefault(w => w.WorkerId == selectedUserId);
      // Worker worker = WorkerService.GetByIdAsync();
-        
 
-       return workShifts = await WorkShiftService.GetAsync(date, worker.getFullName());
+        return workShifts = await WorkShiftService.GetAsync(date, worker.getFullName());
     }
     
     private async Task UpdateDate(int weekNumberChange, int yearChange)
@@ -296,14 +357,60 @@
         await UpdateSchema();
     }
     
-    private void ShowPopUp()
+    private void ShowCreatePopUp()
     {
-        showPopUp = true;
+        showCreatePopUp = true;
     }
     
-    private void ClosePopUp()
+    private void CloseCreatePopUp()
     {
-        showPopUp = false;
+        showCreatePopUp = false;
         navMgr.NavigateTo("/WorkShifts");
     }
+    
+    private void ShowWorkShiftPopUp(string shiftId, string date, string fromTime, string toTime, string breakAmount)
+    {
+        this.shiftId = shiftId;
+        this.date = date;
+        this.fromTime = fromTime;
+        this.toTime = toTime;
+        this.breakAmount = breakAmount;
+        workerId = selectedUserId.ToString();
+        showWorkShiftPopUp = true;
+    }
+    
+    private void CloseWorkShiftPopUp()
+    {
+        showWorkShiftPopUp = false;
+        navMgr.NavigateTo("/WorkShifts");
+    }
+
+    private async Task UpdateWorkShift()
+    {
+        popUpMsg = "";
+        if (string.IsNullOrEmpty(shiftId) || string.IsNullOrEmpty(workerId) || string.IsNullOrEmpty(date) || string.IsNullOrEmpty(fromTime) || string.IsNullOrEmpty(toTime) || string.IsNullOrEmpty(breakAmount))
+        {
+            popUpMsg = "Fields may not be empty";
+            return;
+        }
+        
+        try
+        {
+            WorkShiftUpdateDto dto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
+
+            await WorkShiftService.UpdateAsync(dto);
+            
+    //todo add workshift to schema without calling webapi
+            await UpdateSchema();
+            
+            
+            CloseWorkShiftPopUp();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            popUpMsg = e.Message;
+        }    
+    }
+
 }

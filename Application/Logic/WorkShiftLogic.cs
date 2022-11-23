@@ -74,6 +74,9 @@ public class WorkShiftLogic : IWorkShiftLogic
 
         WorkShift updatedWorkShift = new(dateToUse, fromTimeToUse, toTimeToUse, workerToUse, breakAmountToUse);
         updatedWorkShift.ShiftId = workShift.ShiftId;
+        
+         await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);
+
         await _WorkShiftDao.UpdateAsync(updatedWorkShift);
     }
 
@@ -89,7 +92,7 @@ public class WorkShiftLogic : IWorkShiftLogic
     }
 
 
-    private async Task ValidateWorkShift(WorkShift workShift)
+    private async Task ValidateWorkShift(WorkShift workShift, int? workShiftId = 0)
     {
         //todo check for absence
         //todo add unitTesting!
@@ -98,6 +101,12 @@ public class WorkShiftLogic : IWorkShiftLogic
         ValidateTime(workShift.ToTime);
         ValidateTimes(workShift.FromTime, workShift.ToTime);
         IEnumerable<WorkShift> shifts = await _WorkShiftDao.GetAsync(new SearchShiftParametersDto(workShift.Date,null));
+
+        if (workShiftId != 0)
+        {
+            shifts = shifts.Where(shift => shift.ShiftId != workShiftId).ToList();
+        }
+        
         IsWorkerOccupied(workShift.Worker.WorkerId, workShift.Date, workShift.FromTime, workShift.ToTime,shifts);
     }
 
@@ -188,7 +197,6 @@ public class WorkShiftLogic : IWorkShiftLogic
         {
             throw new Exception($"{foundShift.Worker.getFullName()} already has a shift at that time!");
         }
-        
     }
 
     private int TimeToMinutes(string time)
