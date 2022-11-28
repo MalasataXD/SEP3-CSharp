@@ -9,14 +9,17 @@ public class WorkShiftCreationDto
     public string ToTime { get;} // ? To time (ex. 20:00)
     public int WorkerId { get;} // ? Who?
     public string BreakAmount{get;} // ? How much break the worker has ex. 15 min
+    
+    public string BossId { get; set; } //Who make the shift
 
     // ¤ Constructor
-    public WorkShiftCreationDto(string date, string fromTime, string toTime, int workerId, string breakAmount)
+    public WorkShiftCreationDto(string date, string fromTime, string toTime, int workerId, string breakAmount, string bossId)
     {
         Date = date;
         FromTime = fromTime;
         ToTime = toTime;
         WorkerId = workerId;
         BreakAmount = breakAmount;
+        BossId = bossId;
     }
 }
