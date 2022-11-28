@@ -364,7 +364,7 @@
         
         try
         {
-            WorkShiftCreationDto dto = new(date, fromTime, toTime, selectedUserId ,breakAmount);
+            WorkShiftCreationDto dto = new(date, fromTime, toTime, selectedUserId ,breakAmount, "1");
 
             WorkShift workShift = await WorkShiftService.CreateAsync(dto);
             
