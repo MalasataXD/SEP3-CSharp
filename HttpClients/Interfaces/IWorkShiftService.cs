@@ -8,6 +8,7 @@ public interface IWorkShiftService
     Task<WorkShift> CreateAsync(WorkShiftCreationDto dto);
     Task<IEnumerable<WorkShift>> GetAsync(string? date = null, string? workerName = null);
     Task UpdateAsync(WorkShiftUpdateDto dto);
+    Task DeleteAsync(int id);
 
 
 }

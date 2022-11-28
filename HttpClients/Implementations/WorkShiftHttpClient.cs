@@ -76,13 +76,14 @@ public class WorkShiftHttpClient : IWorkShiftService
             throw new Exception(content);
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+    public async Task DeleteAsync(int id)
+    {
+        HttpResponseMessage response = await client.DeleteAsync($"WorkShift/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                throw new Exception(content);
+            }
+    }
 }
