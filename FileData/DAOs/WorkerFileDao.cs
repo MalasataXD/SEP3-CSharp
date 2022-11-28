@@ -27,7 +27,7 @@ public class WorkerFileDao : IWorkerDao
             workerId = _context.Workers.Max(u => u.WorkerId);
             workerId++;
         }
-        Sender.SendWorker(worker);
+        
         // * Assign Worker the correct Id
         worker.WorkerId = workerId;
         

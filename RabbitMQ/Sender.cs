@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using Domain.DTOs.JavaDTOs;
+using Domain.Models;
 using RabbitMQ.Client;
 
 namespace RabbitMQ;
@@ -11,9 +12,9 @@ public class Sender
     private string DispatcherName { get; }
     
     //Den her skal hedde CreateWorker
-    public void SendWorker(WorkerJavaDto toSend)
+    public void SendWorker(Worker toSend)
     {
-        send("CrateWorker", toSend);
+        send("CrateWorker", new WorkerJavaDto(toSend));
     }
     
     public void CreateShift(ShiftJavaDto toSend)
