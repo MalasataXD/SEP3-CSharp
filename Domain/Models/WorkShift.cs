@@ -10,13 +10,16 @@ public class WorkShift
     public Worker Worker {get; set; } // ? Who works the shift?
     public string BreakAmount{get; set; } // ? How much break the worker has ex. 15 min
     
+    public string BossId { get; set; } //Who make the shift
+    
     // ¤ Constructor
-    public WorkShift(string date, string fromTime,string toTime, Worker worker, string breakAmount)
+    public WorkShift(string date, string fromTime,string toTime, Worker worker, string breakAmount, string bossId)
     {
         Date = date;
         FromTime = fromTime;
         ToTime = toTime;
         Worker = worker;
         BreakAmount = breakAmount;
+        BossId = bossId;
     }
 }
