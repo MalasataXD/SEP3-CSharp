@@ -12,6 +12,8 @@ public class Sender : ISender
 {
     private string HostName { get; }
     private string DispatcherName { get; }
+    
+    private string QueueName { get; }
 
     public Sender()
     {
@@ -19,31 +21,32 @@ public class Sender : ISender
 
         HostName = mqConfig.HostName;
         DispatcherName = mqConfig.DispatcherName;
-    }
-
-    public void Test(MessageHeader messageHeader)
-    {
-        send("Test", messageHeader);
-    }
-
-    public void CreateWorker(Worker toSend)
-    {
-        //send("CrateWorker", new MessageHeader("test", new WorkerJavaDto(toSend)));
-    }
-
-    public void CreateShift(ShiftJavaDto toSend)
-    {
-        //send("CrateShift", toSend);
+        QueueName = mqConfig.QueueName;
     }
     
-    public void EditShift(ShiftJavaDto toSend)
+    public void CreateWorker(Worker toSend)
     {
-        //send("EditShift", toSend);
+        FormatAndSend("CreateWorker", new WorkerJavaDto(toSend));
+    }
+
+    public void CreateShift(WorkShift toSend)
+    {
+        FormatAndSend("CreateShift", new ShiftJavaDto(toSend));
+    }
+    
+    public void EditShift(WorkShift toSend)
+    {
+        FormatAndSend("EditShift", new ShiftJavaDto(toSend));
     }
 
     public void RemoveShift(int shiftId)
     {
-        //send("RemoveShift", shiftId);
+        FormatAndSend("RemoveShift", shiftId);
+    }
+
+    private void FormatAndSend(string Queue, object payload)
+    {
+        send(Queue, new MessageHeader(QueueName, Queue, payload));
     }
 
     private void send(string Queue, MessageHeader toSend)

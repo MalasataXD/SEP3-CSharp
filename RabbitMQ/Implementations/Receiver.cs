@@ -30,13 +30,7 @@ public class Receiver
         thread.Start();
     }
     
-    
-    public object ReceiveTest()
-    {
-        return Receive("TEST").Result;
-    }
-
-    private async Task<object> Receive(string key)
+    public async Task<object> Receive(string key)
     {
         object oldValue;
         map.TryGetValue(key, out oldValue);
@@ -53,9 +47,7 @@ public class Receiver
         }
         throw new Exception("Didn't get new value form server");
     }
-
-
-
+    
     private static void Run()
     {
         var factory = new ConnectionFactory() { HostName = "localhost" };
