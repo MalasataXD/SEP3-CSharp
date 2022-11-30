@@ -27,7 +27,7 @@ public class WorkShiftLogic : IWorkShiftLogic
             throw new Exception("Worker does not exist!");
         }
 
-        WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount, toCreate.BossId);
+        WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount);
         
         await ValidateWorkShift(workShift);
             
@@ -47,7 +47,6 @@ public class WorkShiftLogic : IWorkShiftLogic
 
     public async Task UpdateAsync(WorkShiftUpdateDto toUpdate)
     {
-
         WorkShift? workShift = await _WorkShiftDao.GetByIdAsync(toUpdate.ShiftId);
 
         if (workShift == null)
@@ -82,11 +81,13 @@ public class WorkShiftLogic : IWorkShiftLogic
 
     public async Task DeleteAsync(int shiftId)
     {
+        /*
         WorkShift? workShift = await _WorkShiftDao.GetByIdAsync(shiftId);
         if (workShift == null)
         {
             throw new Exception("Workshift does not exist!");
         }
+        */
 
         await _WorkShiftDao.DeleteAsync(shiftId);
     }

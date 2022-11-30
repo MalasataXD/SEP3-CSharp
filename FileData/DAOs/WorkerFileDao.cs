@@ -28,6 +28,8 @@ public class WorkerFileDao : IWorkerDao
             workerId++;
         }
         
+        //Sender.SendWorker(worker);
+        
         // * Assign Worker the correct Id
         worker.WorkerId = workerId;
         

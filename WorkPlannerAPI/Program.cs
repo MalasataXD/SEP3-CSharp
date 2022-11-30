@@ -2,10 +2,10 @@ using System.Text;
 using Application.DAOInterfaces;
 using Application.Logic;
 using Application.LogicInterfaces;
-using FileData;
-using FileData.DAOs;
+using DatabaseConnection.DAOs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ;
 using Shared.Auth;
 using Shared.FileIO;
 using Shared.FileIO.DAOs;
@@ -21,9 +21,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // NOTE: We have added these!
-builder.Services.AddScoped<FileContext>();
-builder.Services.AddScoped<IWorkerDao, WorkerFileDao>();
-builder.Services.AddScoped<IWorkShiftDao, WorkShiftFileDao>();
+builder.Services.AddScoped<Sender>();
+builder.Services.AddScoped<IWorkerDao, WorkerDao>();
+builder.Services.AddScoped<IWorkShiftDao, WorkShiftDao>();
+
 builder.Services.AddScoped<IWorkerLogic,WorkerLogic>();
 builder.Services.AddScoped<IWorkShiftLogic,WorkShiftLogic>();
 

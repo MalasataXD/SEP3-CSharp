@@ -12,7 +12,7 @@ public class WorkShiftCreationDto
     
     public string BossId { get; set; } //Who make the shift
 
-    // ¤ Constructor
+    // Â¤ Constructor
     public WorkShiftCreationDto(string date, string fromTime, string toTime, int workerId, string breakAmount, string bossId)
     {
         Date = date;
