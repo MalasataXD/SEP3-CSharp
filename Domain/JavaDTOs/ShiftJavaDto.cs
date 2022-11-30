@@ -41,8 +41,6 @@ public class ShiftJavaDto
         
         this.workerId = workShift.Worker.WorkerId;
         this.breakAmount = Convert.ToInt32(workShift.BreakAmount);
-        
-        this.bossId = Convert.ToInt32(workShift.BossId);
     }
 }
 

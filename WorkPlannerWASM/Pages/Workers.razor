@@ -178,11 +178,13 @@ else
         {
             WorkerCreationDto dto = new(firstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
             Worker worker = await WorkerService.CreateAsync(dto);
-
+            
+            /*
             var list = new List<Worker>(workers!);
             list.Add(worker);
             workers = list.AsEnumerable();
             workers = await WorkerService.GetAsync(null);
+            */
             
             ClosePopUp();
         }

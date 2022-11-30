@@ -4,10 +4,11 @@ using System.Text.Json;
 using Domain.DTOs.JavaDTOs;
 using Domain.Models;
 using RabbitMQ.Client;
+using RabbitMQ.Interfaces;
 
 namespace RabbitMQ;
 
-public class Sender
+public class Sender : ISender
 {
     private string HostName { get; }
     private string DispatcherName { get; }
@@ -29,7 +30,7 @@ public class Sender
     {
         //send("CrateWorker", new MessageHeader("test", new WorkerJavaDto(toSend)));
     }
-    
+
     public void CreateShift(ShiftJavaDto toSend)
     {
         //send("CrateShift", toSend);

@@ -24,12 +24,14 @@ public class WorkerLogic : IWorkerLogic
             toCreate.Address);
         
         ValidateWorker(worker);
-        
+    
+        /*
         Worker? exists = await _workerDao.GetByFullNameAsync(worker.getFullName());
         if (exists != null)
         {
             throw new Exception("Worker already exists!");
         }
+        */
         
         return await _workerDao.CreateAsync(worker);
     }

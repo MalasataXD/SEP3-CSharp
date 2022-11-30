@@ -1,4 +1,5 @@
-﻿using Domain.DTOs.SearchParameters;
+﻿using Domain.DTOs.JavaDTOs;
+using Domain.DTOs.SearchParameters;
 using Domain.Models;
 
 namespace Application.DAOInterfaces;
