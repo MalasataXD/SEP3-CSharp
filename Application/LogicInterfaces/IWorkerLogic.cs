@@ -8,6 +8,7 @@ public interface IWorkerLogic
 {
     Task<Worker> CreateAsync(WorkerCreationDto toCreate);
     Task<IEnumerable<Worker>> GetAsync(SearchWorkerParametersDto searchWorkerParametersDto);
+    Task UpdateAsync(WorkerUpdateDto toUpdate); 
     Task DeleteAsync(int workerId);
 
 }

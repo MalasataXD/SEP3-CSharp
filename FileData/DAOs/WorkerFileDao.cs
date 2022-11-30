@@ -81,7 +81,22 @@ public class WorkerFileDao : IWorkerDao
 
         return Task.FromResult(toFind);
     }
-    
+
+    public Task UpdateAsync(Worker toUpdate)
+    {
+        Worker existing = _context.Workers.FirstOrDefault(worker => worker.WorkerId == toUpdate.WorkerId);
+        if (existing == null)
+        {
+            throw new Exception($"A Worker with id {toUpdate.WorkerId} does not exist!");
+        }
+
+        _context.Workers.Remove(existing);
+        _context.Workers.Add(toUpdate);
+        
+        _context.SaveChanges();
+
+        return Task.CompletedTask;    }
+
     // ¤ Delete Worker
     public Task DeleteAsync(int workerId)
     {

@@ -39,6 +39,32 @@ public class WorkerLogic : IWorkerLogic
        return await _workerDao.GetAsync(searchWorkerParametersDto);
     }
 
+    public async Task UpdateAsync(WorkerUpdateDto toUpdate)
+    {
+            Worker? worker = await _workerDao.GetByIdAsync(toUpdate.WorkerId);
+
+            if (worker == null)
+            {
+                throw new Exception("Worker does not exist!");
+            }
+
+            string firstName = toUpdate.FirstName ?? worker.FirstName;
+            string lastName = toUpdate.LastName ?? worker.LastName;
+            int phoneNumber = toUpdate.PhoneNumber ?? worker.PhoneNumber;
+            string mail = toUpdate.Mail ?? worker.Mail;
+            string adress = toUpdate.Adress ?? worker.Address;
+
+            Worker updatedWorker = new(firstName, lastName,phoneNumber,mail,adress);
+            updatedWorker.WorkerId = worker.WorkerId;
+
+            ValidateWorker(updatedWorker);
+            
+            await _workerDao.UpdateAsync(updatedWorker);
+        }    
+
+
+
+
     public async Task DeleteAsync(int workerId)
     {
         Worker? workShift = await _workerDao.GetByIdAsync(workerId);
@@ -58,6 +84,7 @@ public class WorkerLogic : IWorkerLogic
         ValidatePhoneNumber(worker.PhoneNumber);
         ValidateAddress(worker.Address);
     }
+
     private void ValidateName(string firstName, string lastName)
     {
         string[] lastNames = lastName.Split(" ");
