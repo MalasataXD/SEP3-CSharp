@@ -9,8 +9,9 @@ public class WorkerJavaDto
     public string mail { get; }
     public string address { get; }
 
-    public WorkerJavaDto(string firstName, string lastName, int phoneNumber, string mail, string address)
+    public WorkerJavaDto(int workerId, string firstName, string lastName, int phoneNumber, string mail, string address)
     {
+        this.workerId = workerId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -25,5 +26,9 @@ public class WorkerJavaDto
         this.phoneNumber = worker.PhoneNumber;
         this.mail = worker.Mail;
         this.address = worker.Address;
+    }
+
+    public WorkerJavaDto()
+    {
     }
 }

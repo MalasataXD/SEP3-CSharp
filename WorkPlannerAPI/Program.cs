@@ -22,6 +22,7 @@ builder.Services.AddSwaggerGen();
 
 // NOTE: We have added these!
 builder.Services.AddScoped<Sender>();
+builder.Services.AddScoped<Receiver>();
 builder.Services.AddScoped<IWorkerDao, WorkerDao>();
 builder.Services.AddScoped<IWorkShiftDao, WorkShiftDao>();
 

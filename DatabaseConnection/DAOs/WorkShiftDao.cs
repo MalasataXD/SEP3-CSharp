@@ -9,20 +9,28 @@ namespace DatabaseConnection.DAOs;
 public class WorkShiftDao : IWorkShiftDao
 {
     private readonly Sender sender;
+    private readonly Receiver receiver;
 
-    public WorkShiftDao(Sender sender)
+    public WorkShiftDao(Sender sender, Receiver receiver)
     {
         this.sender = sender;
+        this.receiver = receiver;
     }
 
-    public Task<WorkShift> CreateAsync(WorkShift shift)
+    public async Task<WorkShift> CreateAsync(WorkShift shift)
     {
-        ShiftJavaDto newShift = new ShiftJavaDto(shift);
         
         try
         {
-            sender.CreateShift(newShift);
-            return Task.FromResult(shift);
+            sender.CreateShift(shift);
+
+            object obj = Task.FromResult(receiver.Receive("CreateShift"));
+            ShiftJavaDto dto = (ShiftJavaDto) obj;
+
+            Worker worker = new Worker("", "", 0, "", "");
+            worker.WorkerId = dto.workerId;
+            
+            return new WorkShift(dto.date, dto.fromHour + ":" + dto.fromMinute, dto.toHour + ":" + dto.toMinute, worker, dto.breakAmount.ToString(), dto.bossId.ToString());
         }
         catch (Exception e)
         {

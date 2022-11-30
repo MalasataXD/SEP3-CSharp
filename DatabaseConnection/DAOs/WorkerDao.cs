@@ -44,6 +44,12 @@ public class WorkerDao : IWorkerDao
         throw new NotImplementedException();
     }
 
+    public Task UpdateAsync(Worker toUpdate)
+    {
+
+        throw new NotImplementedException();
+    }
+
     public Task DeleteAsync(int workerId)
     {
         throw new NotImplementedException();

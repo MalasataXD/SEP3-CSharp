@@ -27,7 +27,7 @@ public class WorkShiftLogic : IWorkShiftLogic
             throw new Exception("Worker does not exist!");
         }
 
-        WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount);
+        WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount, toCreate.BossId);
         
         await ValidateWorkShift(workShift);
             
