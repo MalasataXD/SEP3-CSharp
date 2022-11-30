@@ -71,7 +71,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         string toTimeToUse = toUpdate.ToTime ?? workShift.ToTime;
         string breakAmountToUse = toUpdate.BreakAmount ?? workShift.BreakAmount;
 
-        WorkShift updatedWorkShift = new(dateToUse, fromTimeToUse, toTimeToUse, workerToUse, breakAmountToUse);
+        WorkShift updatedWorkShift = new(dateToUse, fromTimeToUse, toTimeToUse, workerToUse, breakAmountToUse, "1");
         updatedWorkShift.ShiftId = workShift.ShiftId;
         
          await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);

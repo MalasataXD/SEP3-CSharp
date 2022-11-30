@@ -9,5 +9,6 @@ public interface IWorkerDao
     Task<IEnumerable<Worker>> GetAsync(SearchWorkerParametersDto searchParameters);
     Task<Worker?> GetByIdAsync(int workerId);
     Task<Worker?> GetByFullNameAsync(string fullName); // NOTE: Could be removed, if not needed?
+    Task UpdateAsync(Worker toUpdate);
     Task DeleteAsync(int workerId);
 }

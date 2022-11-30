@@ -53,6 +53,23 @@ public class WorkerController : ControllerBase
         }
     }
     
+    
+    // ¤ Update Worker
+    [HttpPatch]
+    public async Task<ActionResult> UpdateAsync([FromBody] WorkerUpdateDto toUpdate)
+    {
+        try
+        {
+            await _workerLogic.UpdateAsync(toUpdate);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
     // ¤ Delete Worker
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteAsync([FromRoute] int id)
