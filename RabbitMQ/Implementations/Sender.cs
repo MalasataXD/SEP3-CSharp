@@ -24,6 +24,7 @@ public class Sender : ISender
         QueueName = mqConfig.QueueName;
     }
     
+    //Create
     public void CreateWorker(Worker toSend)
     {
         FormatAndSend("CreateWorker", new WorkerJavaDto(toSend));
@@ -34,16 +35,37 @@ public class Sender : ISender
         FormatAndSend("CreateShift", new ShiftJavaDto(toSend));
     }
     
+    //Edit
+    public void EditWorker(Worker toSend)
+    {
+        FormatAndSend("EditWorker", new WorkerJavaDto(toSend));
+    }
     public void EditShift(WorkShift toSend)
     {
         FormatAndSend("EditShift", new ShiftJavaDto(toSend));
     }
 
+    //Remove
+    public void RemoveWorker(int workerId)
+    {
+        FormatAndSend("RemoveShift", workerId);
+    }
     public void RemoveShift(int shiftId)
     {
         FormatAndSend("RemoveShift", shiftId);
     }
 
+    //GetById
+    public void GetWorkerById(int workerId)
+    {
+        FormatAndSend("GetWorkerById", workerId);
+    }
+
+    public void GetShiftById(int shiftId)
+    {
+        FormatAndSend("GetShiftById", shiftId);
+    }
+    
     private void FormatAndSend(string Queue, object payload)
     {
         send(Queue, new MessageHeader(QueueName, Queue, payload));
