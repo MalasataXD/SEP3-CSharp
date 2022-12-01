@@ -19,12 +19,11 @@ public class WorkShiftDao : IWorkShiftDao
 
     public async Task<WorkShift> CreateAsync(WorkShift shift)
     {
-        
         try
         {
             sender.CreateShift(shift);
 
-            object obj = Task.FromResult(receiver.Receive("CreateShift"));
+            object obj = Task.FromResult(await receiver.Receive("CreateShift"));
             ShiftJavaDto dto = (ShiftJavaDto) obj;
 
             Worker worker = new Worker("", "", 0, "", "");
@@ -44,18 +43,75 @@ public class WorkShiftDao : IWorkShiftDao
         throw new NotImplementedException();
     }
     
-    public Task<WorkShift?> GetByIdAsync(int shiftId)
+    public async Task<WorkShift?> GetByIdAsync(int shiftId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            sender.GetShiftById(shiftId);
+
+            object obj = Task.FromResult(await receiver.Receive("GetShiftById"));
+            ShiftJavaDto dto = (ShiftJavaDto) obj;
+            
+            Worker worker = new Worker("", "", 0, "", "");
+            worker.WorkerId = dto.workerId;
+
+            return new WorkShift(
+                dto.date,
+                $"{dto.fromHour}:{dto.fromMinute}",
+                $"{dto.toHour}:{dto.toMinute}",
+                worker,
+                dto.breakAmount.ToString(),
+                dto.bossId.ToString()
+            );
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task UpdateAsync(WorkShift toUpdate)
+    public async Task<WorkShift> UpdateAsync(WorkShift toUpdate)
     {
-        throw new NotImplementedException();
+        try
+        {
+            sender.EditShift(toUpdate);
+
+            object obj = Task.FromResult(await receiver.Receive("EditShift"));
+            ShiftJavaDto receivedObj = (ShiftJavaDto) obj;
+            
+            Worker worker = new Worker("", "", 0, "", "");
+            worker.WorkerId = receivedObj.workerId;
+
+            return new WorkShift(
+                receivedObj.date,
+                $"{receivedObj.fromHour}:{receivedObj.fromMinute}",
+                $"{receivedObj.toHour}:{receivedObj.toMinute}",
+                worker,
+                receivedObj.breakAmount.ToString(),
+                receivedObj.bossId.ToString()
+                );
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not edit shift");
+        }
     }
 
     public Task DeleteAsync(int shiftId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            sender.RemoveShift(shiftId);
+            return Task.CompletedTask;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not delete user");
+        }
     }
 }

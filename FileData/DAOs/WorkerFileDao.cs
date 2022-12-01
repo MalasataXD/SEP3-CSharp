@@ -53,7 +53,7 @@ public class WorkerFileDao : IWorkerDao
     }
 
     // ¤ Get by Id
-    public Task<Worker?> GetByIdAsync(int workerId)
+    public Task<Worker> GetByIdAsync(int workerId)
     {
         Worker? toFind = null;
 
@@ -69,7 +69,7 @@ public class WorkerFileDao : IWorkerDao
     }
 
     // ¤ Get by FullName
-    public Task<Worker?> GetByFullNameAsync(string fullName)
+    public Task<Worker> GetByFullNameAsync(string fullName)
     {
         Worker? toFind = null;
 
@@ -84,7 +84,7 @@ public class WorkerFileDao : IWorkerDao
         return Task.FromResult(toFind);
     }
 
-    public Task UpdateAsync(Worker toUpdate)
+    public async Task<Worker> UpdateAsync(Worker toUpdate)
     {
         Worker existing = _context.Workers.FirstOrDefault(worker => worker.WorkerId == toUpdate.WorkerId);
         if (existing == null)
@@ -97,7 +97,8 @@ public class WorkerFileDao : IWorkerDao
         
         _context.SaveChanges();
 
-        return Task.CompletedTask;    }
+        return existing;
+    }
 
     // ¤ Delete Worker
     public Task DeleteAsync(int workerId)

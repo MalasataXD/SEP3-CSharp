@@ -9,6 +9,6 @@ public interface IWorkShiftDao
     Task<WorkShift> CreateAsync(WorkShift shift); // ¤ Create (Post)
     Task<IEnumerable<WorkShift>> GetAsync(SearchShiftParametersDto searchParameters); // ¤ Get
     Task<WorkShift?> GetByIdAsync(int shiftId); // ¤ Get
-    Task UpdateAsync(WorkShift toUpdate); // ¤ Update (Patch)
+    Task<WorkShift> UpdateAsync(WorkShift toUpdate); // ¤ Update (Patch)
     Task DeleteAsync(int shiftId); // ¤ Delete
 }

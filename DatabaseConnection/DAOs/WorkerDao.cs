@@ -1,4 +1,5 @@
-﻿using Application.DAOInterfaces;
+﻿using System.ComponentModel.Design;
+using Application.DAOInterfaces;
 using Domain.DTOs.JavaDTOs;
 using Domain.DTOs.SearchParameters;
 using Domain.Models;
@@ -9,10 +10,12 @@ namespace DatabaseConnection.DAOs;
 public class WorkerDao : IWorkerDao
 {
     private readonly Sender sender;
+    private readonly Receiver receiver;
     
-    public WorkerDao(Sender sender)
+    public WorkerDao(Sender sender, Receiver receiver)
     {
         this.sender = sender;
+        this.receiver = receiver;
     }
     
     public Task<Worker> CreateAsync(Worker worker)
@@ -34,24 +37,77 @@ public class WorkerDao : IWorkerDao
         throw new NotImplementedException();
     }
 
-    public Task<Worker?> GetByIdAsync(int workerId)
+    public async Task<Worker> GetByIdAsync(int workerId)
+    {
+        try
+        {
+            sender.GetWorkerById(workerId);
+
+            object obj = Task.FromResult(await receiver.Receive("GetWorkerById"));
+            WorkerJavaDto dto = (WorkerJavaDto) obj;
+
+            Worker worker = new Worker(
+                dto.firstName,
+                dto.lastName,
+                dto.phoneNumber,
+                dto.mail,
+                dto.address
+            );
+            worker.WorkerId = dto.workerId;
+
+            return worker;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not get worker");
+        }
+    }
+
+    public Task<Worker> GetByFullNameAsync(string fullName)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Worker?> GetByFullNameAsync(string fullName)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateAsync(Worker toUpdate)
+    public async Task<Worker> UpdateAsync(Worker toUpdate)
     {
 
-        throw new NotImplementedException();
-    }
+        try
+        {
+            sender.EditWorker(toUpdate);
 
+            object obj = Task.FromResult(await receiver.Receive("EditWorker"));
+            WorkerJavaDto dto = (WorkerJavaDto) obj;
+
+            Worker worker = new Worker(
+                dto.firstName,
+                dto.lastName,
+                dto.phoneNumber,
+                dto.mail,
+                dto.address
+            );
+            worker.WorkerId = dto.workerId;
+
+            return worker;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not update worker");
+        }
+    }
+    
     public Task DeleteAsync(int workerId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            sender.RemoveWorker(workerId);
+            return Task.CompletedTask;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not delete worker");
+        }
     }
 }

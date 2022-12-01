@@ -62,7 +62,7 @@ public class WorkShiftFileDao : IWorkShiftDao
     }
 
     // ¤ Update Shift
-    public Task UpdateAsync(WorkShift toUpdate)
+    public async Task<WorkShift> UpdateAsync(WorkShift toUpdate)
     {
         // * Check if a shift with the id exists
         WorkShift? existing = _context.Shifts.FirstOrDefault(shift => shift.ShiftId == toUpdate.ShiftId);
@@ -78,7 +78,7 @@ public class WorkShiftFileDao : IWorkShiftDao
         // * Save changes
         _context.SaveChanges();
 
-        return Task.CompletedTask;
+        return toUpdate;
     }
 
     // ¤ Delete Shift

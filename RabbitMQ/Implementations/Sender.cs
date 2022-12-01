@@ -12,7 +12,6 @@ public class Sender : ISender
 {
     private string HostName { get; }
     private string DispatcherName { get; }
-    
     private string QueueName { get; }
 
     public Sender()
@@ -24,48 +23,48 @@ public class Sender : ISender
         QueueName = mqConfig.QueueName;
     }
     
-    //Create
+    //Worker methods
     public void CreateWorker(Worker toSend)
     {
         FormatAndSend("CreateWorker", new WorkerJavaDto(toSend));
     }
 
+    public void EditWorker(Worker toSend)
+    {
+        FormatAndSend("EditWorker", new WorkerJavaDto(toSend));
+    }
+
+    public void RemoveWorker(int workerId)
+    {
+        FormatAndSend("RemoveWorker", workerId);
+    }
+
+    public void GetWorkerById(int workerId)
+    {
+        FormatAndSend("GetWorkerById", workerId);
+    }
+
+    //Shift methods
     public void CreateShift(WorkShift toSend)
     {
         FormatAndSend("CreateShift", new ShiftJavaDto(toSend));
     }
     
-    //Edit
-    public void EditWorker(Worker toSend)
-    {
-        FormatAndSend("EditWorker", new WorkerJavaDto(toSend));
-    }
     public void EditShift(WorkShift toSend)
     {
         FormatAndSend("EditShift", new ShiftJavaDto(toSend));
     }
 
-    //Remove
-    public void RemoveWorker(int workerId)
-    {
-        FormatAndSend("RemoveShift", workerId);
-    }
     public void RemoveShift(int shiftId)
     {
         FormatAndSend("RemoveShift", shiftId);
-    }
-
-    //GetById
-    public void GetWorkerById(int workerId)
-    {
-        FormatAndSend("GetWorkerById", workerId);
     }
 
     public void GetShiftById(int shiftId)
     {
         FormatAndSend("GetShiftById", shiftId);
     }
-    
+
     private void FormatAndSend(string Queue, object payload)
     {
         send(Queue, new MessageHeader(QueueName, Queue, payload));
