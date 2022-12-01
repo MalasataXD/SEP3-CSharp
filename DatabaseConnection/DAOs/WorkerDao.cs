@@ -18,12 +18,25 @@ public class WorkerDao : IWorkerDao
         this.receiver = receiver;
     }
     
-    public Task<Worker> CreateAsync(Worker worker)
+    public async Task<Worker> CreateAsync(Worker worker)
     {
         try
         {
             sender.CreateWorker(worker);
-            return Task.FromResult(worker);
+
+            object obj = Task.FromResult(await receiver.Receive("CreateWorker"));
+            WorkerJavaDto dto = (WorkerJavaDto) obj;
+
+            Worker newWorker = new Worker(
+                dto.firstName,
+                dto.lastName,
+                dto.phoneNumber,
+                dto.mail,
+                dto.address
+            );
+            newWorker.WorkerId = dto.workerId;
+
+            return newWorker;
         }
         catch (Exception e)
         {
