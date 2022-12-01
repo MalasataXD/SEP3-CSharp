@@ -12,9 +12,8 @@ public class Receiver
     private string HostName;
     private string Id;
     private static string QueueName;
-    public static object test123;
-    
-    
+
+
     //Oof
     private static Dictionary<string, object> map;
     
@@ -67,7 +66,9 @@ public class Receiver
                 var message = Encoding.UTF8.GetString(body);
                 MessageHeader? messageHeader = JsonSerializer.Deserialize<MessageHeader>(message);
                 Console.WriteLine(" [x] Received {0}", messageHeader);
-
+                
+                Console.WriteLine(messageHeader.payload + " Class: " + messageHeader.payload.GetType());
+                
                 //virker nok ikke
                 map.Add(messageHeader.action, messageHeader.payload);
             };

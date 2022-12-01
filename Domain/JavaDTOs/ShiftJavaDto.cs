@@ -2,15 +2,15 @@
 
 public class ShiftJavaDto
 {
-    private int shiftId;
-    public String date;
-    public int fromHour;
-    public int fromMinute;
-    public int toHour;
-    public int toMinute;
-    public int workerId;
-    public int breakAmount;
-    public int bossId;
+    public int shiftId{ set; get; }
+    public String date{ set; get; }
+    public int fromHour{ set; get; }
+    public int fromMinute{ set; get; }
+    public int toHour{ set; get; }
+    public int toMinute{ set; get; }
+    public int workerId{ set; get; }
+    public int breakAmount{ set; get; }
+    public int bossId{ set; get; }
 
     public ShiftJavaDto(int shiftId, string date, int fromHour, int fromMinute, int toHour, int toMinute, int workerId, int breakAmount, int bossId)
     {
@@ -41,7 +41,11 @@ public class ShiftJavaDto
         
         this.workerId = workShift.Worker.WorkerId;
         this.breakAmount = Convert.ToInt32(workShift.BreakAmount);
+        this.bossId = Convert.ToInt32(workShift.BossId);
     }
 
+    public ShiftJavaDto()
+    {
+    }
 }
 

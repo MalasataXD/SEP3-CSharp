@@ -79,7 +79,8 @@ public class Sender : ISender
             channel.QueueDeclare(queue: Queue, durable: false, exclusive: false, autoDelete: false, arguments: null);
             string message = JsonSerializer.Serialize(toSend);
 
-            Console.WriteLine("toSend: " + message);
+            Console.WriteLine("toSend header: " + message);
+            Console.WriteLine("toSend Payload: " + toSend.payload);
             
             var body = Encoding.UTF8.GetBytes(message);
 

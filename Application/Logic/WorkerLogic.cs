@@ -59,7 +59,7 @@ public class WorkerLogic : IWorkerLogic
             Worker updatedWorker = new(firstName, lastName,phoneNumber,mail,adress);
             updatedWorker.WorkerId = worker.WorkerId;
 
-            ValidateWorker(updatedWorker);
+            //ValidateWorker(updatedWorker);
             
             await _workerDao.UpdateAsync(updatedWorker);
         }    

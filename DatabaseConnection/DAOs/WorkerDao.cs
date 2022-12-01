@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.Design;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Application.DAOInterfaces;
 using Domain.DTOs.JavaDTOs;
 using Domain.DTOs.SearchParameters;
@@ -23,9 +25,8 @@ public class WorkerDao : IWorkerDao
         try
         {
             sender.CreateWorker(worker);
-
-            object obj = Task.FromResult(await receiver.Receive("CreateWorker"));
-            WorkerJavaDto dto = (WorkerJavaDto) obj;
+            object obj = await receiver.Receive("CreateWorker");
+            WorkerJavaDto? dto = JsonSerializer.Deserialize<WorkerJavaDto>((JsonElement)obj);
 
             Worker newWorker = new Worker(
                 dto.firstName,
@@ -56,9 +57,13 @@ public class WorkerDao : IWorkerDao
         {
             sender.GetWorkerById(workerId);
 
-            object obj = Task.FromResult(await receiver.Receive("GetWorkerById"));
-            WorkerJavaDto dto = (WorkerJavaDto) obj;
-
+            object obj = await receiver.Receive("GetWorkerById");
+            Console.WriteLine("From server obj: " + obj);
+            
+            WorkerJavaDto? dto = JsonSerializer.Deserialize<WorkerJavaDto>((JsonElement)obj);
+            
+            Console.WriteLine("From server id: " + dto.workerId);
+            Console.WriteLine("From server name: " + dto.firstName);
             Worker worker = new Worker(
                 dto.firstName,
                 dto.lastName,
@@ -89,8 +94,8 @@ public class WorkerDao : IWorkerDao
         {
             sender.EditWorker(toUpdate);
 
-            object obj = Task.FromResult(await receiver.Receive("EditWorker"));
-            WorkerJavaDto dto = (WorkerJavaDto) obj;
+            object obj = await receiver.Receive("EditWorker");
+            WorkerJavaDto? dto = JsonSerializer.Deserialize<WorkerJavaDto>((JsonElement)obj);;
 
             Worker worker = new Worker(
                 dto.firstName,

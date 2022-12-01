@@ -2,12 +2,12 @@
 
 public class WorkerJavaDto
 {
-    public int workerId { get; }
-    public string firstName { get; }
-    public string lastName { get; }
-    public int phoneNumber { get; }
-    public string mail { get; }
-    public string address { get; }
+    public int workerId{ set; get; }
+    public string firstName{ set; get; }
+    public string lastName{ set; get; }
+    public int phoneNumber{ set; get; }
+    public string mail{ set; get;}
+    public string address { set; get;}
 
     public WorkerJavaDto(int workerId, string firstName, string lastName, int phoneNumber, string mail, string address)
     {
@@ -21,6 +21,7 @@ public class WorkerJavaDto
     
     public WorkerJavaDto(Models.Worker worker)
     {
+        this.workerId = worker.WorkerId;
         this.firstName = worker.FirstName;
         this.lastName = worker.LastName;
         this.phoneNumber = worker.PhoneNumber;

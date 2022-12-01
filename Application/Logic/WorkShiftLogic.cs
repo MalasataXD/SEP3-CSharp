@@ -1,4 +1,5 @@
-﻿using Application.DAOInterfaces;
+﻿using System.Text.Json;
+using Application.DAOInterfaces;
 using Application.LogicInterfaces;
 using Domain.DTOs.SearchParameters;
 using Domain.DTOs.Worker;
@@ -21,6 +22,7 @@ public class WorkShiftLogic : IWorkShiftLogic
 
     public async Task<WorkShift> CreateAsync(WorkShiftCreationDto toCreate)
     {
+
         Worker? worker = await _WorkerDao.GetByIdAsync(toCreate.WorkerId);
         if (worker == null)
         {
@@ -29,7 +31,7 @@ public class WorkShiftLogic : IWorkShiftLogic
 
         WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount, toCreate.BossId);
         
-        await ValidateWorkShift(workShift);
+        //await ValidateWorkShift(workShift);
             
         return await _WorkShiftDao.CreateAsync(workShift);
     }
@@ -48,7 +50,7 @@ public class WorkShiftLogic : IWorkShiftLogic
     public async Task UpdateAsync(WorkShiftUpdateDto toUpdate)
     {
         WorkShift? workShift = await _WorkShiftDao.GetByIdAsync(toUpdate.ShiftId);
-
+        Console.WriteLine("Logic getById: " + JsonSerializer.Serialize(workShift));
         if (workShift == null)
         {
             throw new Exception("Workshift does not exist!");
@@ -74,7 +76,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         WorkShift updatedWorkShift = new(dateToUse, fromTimeToUse, toTimeToUse, workerToUse, breakAmountToUse, "1");
         updatedWorkShift.ShiftId = workShift.ShiftId;
         
-         await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);
+         //await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);
 
         await _WorkShiftDao.UpdateAsync(updatedWorkShift);
     }

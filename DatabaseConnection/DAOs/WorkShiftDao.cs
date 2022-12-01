@@ -1,4 +1,6 @@
-﻿using Application.DAOInterfaces;
+﻿using System.Security.AccessControl;
+using System.Text.Json;
+using Application.DAOInterfaces;
 using Domain.DTOs.JavaDTOs;
 using Domain.DTOs.SearchParameters;
 using Domain.Models;
@@ -21,10 +23,12 @@ public class WorkShiftDao : IWorkShiftDao
     {
         try
         {
+            Console.WriteLine("Dao: " + shift.Date + " " + shift.BossId + "" + shift.Worker.WorkerId);
+            
             sender.CreateShift(shift);
 
-            object obj = Task.FromResult(await receiver.Receive("CreateShift"));
-            ShiftJavaDto dto = (ShiftJavaDto) obj;
+            object obj = await receiver.Receive("CreateShift");
+            ShiftJavaDto? dto = JsonSerializer.Deserialize<ShiftJavaDto>((JsonElement)obj);
 
             Worker worker = new Worker("", "", 0, "", "");
             worker.WorkerId = dto.workerId;
@@ -49,13 +53,13 @@ public class WorkShiftDao : IWorkShiftDao
         {
             sender.GetShiftById(shiftId);
 
-            object obj = Task.FromResult(await receiver.Receive("GetShiftById"));
-            ShiftJavaDto dto = (ShiftJavaDto) obj;
+            object obj = await receiver.Receive("GetShiftById");
+            ShiftJavaDto? dto = JsonSerializer.Deserialize<ShiftJavaDto>((JsonElement)obj);
             
             Worker worker = new Worker("", "", 0, "", "");
             worker.WorkerId = dto.workerId;
 
-            return new WorkShift(
+            WorkShift workShift = new WorkShift(
                 dto.date,
                 $"{dto.fromHour}:{dto.fromMinute}",
                 $"{dto.toHour}:{dto.toMinute}",
@@ -63,7 +67,11 @@ public class WorkShiftDao : IWorkShiftDao
                 dto.breakAmount.ToString(),
                 dto.bossId.ToString()
             );
-            
+            workShift.ShiftId = dto.shiftId;
+
+            return workShift;
+
+
         }
         catch (Exception e)
         {
@@ -76,22 +84,29 @@ public class WorkShiftDao : IWorkShiftDao
     {
         try
         {
+            Console.WriteLine(JsonSerializer.Serialize(toUpdate));
             sender.EditShift(toUpdate);
 
-            object obj = Task.FromResult(await receiver.Receive("EditShift"));
-            ShiftJavaDto receivedObj = (ShiftJavaDto) obj;
+            object obj = await receiver.Receive("EditShift");
+            ShiftJavaDto? receivedObj = JsonSerializer.Deserialize<ShiftJavaDto>((JsonElement)obj);
             
             Worker worker = new Worker("", "", 0, "", "");
             worker.WorkerId = receivedObj.workerId;
 
-            return new WorkShift(
+            
+            WorkShift workShift = new WorkShift(
                 receivedObj.date,
                 $"{receivedObj.fromHour}:{receivedObj.fromMinute}",
                 $"{receivedObj.toHour}:{receivedObj.toMinute}",
                 worker,
                 receivedObj.breakAmount.ToString(),
                 receivedObj.bossId.ToString()
-                );
+            );
+
+            workShift.ShiftId = receivedObj.shiftId;
+ 
+            return workShift;
+
 
         }
         catch (Exception e)
