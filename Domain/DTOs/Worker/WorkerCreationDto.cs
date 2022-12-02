@@ -18,4 +18,9 @@ public class WorkerCreationDto
         Mail = mail;
         Address = address;
     }
+
+    public void String()
+    {
+        string.Equals(FirstName,LastName);
+    }
 }

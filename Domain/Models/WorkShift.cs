@@ -22,4 +22,17 @@ public class WorkShift
         BreakAmount = breakAmountToUse;
         BossId = bossId;
     }
+    
+    
+    public WorkShift(int shiftId,string dateToUse, string fromTimeToUse, string toTimeToUse, Worker workerToUse, string breakAmountToUse, string bossId)
+    {
+        ShiftId = shiftId;
+        Date = dateToUse;
+        FromTime = fromTimeToUse;
+        ToTime = toTimeToUse;
+        Worker = workerToUse;
+        BreakAmount = breakAmountToUse;
+        BossId = bossId;
+    }
+    
 }

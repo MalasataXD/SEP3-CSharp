@@ -23,17 +23,20 @@ public class WorkShiftDao : IWorkShiftDao
     {
         try
         {
-            Console.WriteLine("Dao: " + shift.Date + " " + shift.BossId + "" + shift.Worker.WorkerId);
-            
+            // # Send "CreateShift" to dispatcher
             sender.CreateShift(shift);
-
+            
+            // < Wait until we have received the shift
             object obj = await receiver.Receive("CreateShift");
-            ShiftJavaDto? dto = JsonSerializer.Deserialize<ShiftJavaDto>((JsonElement)obj);
-
+            ShiftJavaDto? dto = JsonSerializer.Deserialize<ShiftJavaDto>((JsonElement) obj);
+            
+            // # Set Worker Id in shift
             Worker worker = new Worker("", "", 0, "", "");
             worker.WorkerId = dto.workerId;
             
-            return new WorkShift(dto.date, dto.fromHour + ":" + dto.fromMinute, dto.toHour + ":" + dto.toMinute, worker, dto.breakAmount.ToString(), dto.bossId.ToString());
+            
+            // # Return the shift.
+            return new WorkShift(dto.shiftId,dto.date, dto.fromHour + ":" + dto.fromMinute, dto.toHour + ":" + dto.toMinute, worker, dto.breakAmount.ToString(), dto.bossId.ToString());
         }
         catch (Exception e)
         {
