@@ -214,6 +214,10 @@ else
             
             workers = await WorkerService.GetAsync(null);
 
+            await LoadWorkers();
+            
+            isButtonDisabled = false;
+
         }
         catch (Exception e)
         {
@@ -221,6 +225,5 @@ else
             isButtonDisabled = false;
             msg = e.Message;
         }
-        isButtonDisabled = false;
     }
 }
