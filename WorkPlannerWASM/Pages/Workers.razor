@@ -18,7 +18,7 @@
 </div>
 
 <div>
-    <button @onclick="ShowPopUp">Create</button>
+    <button @onclick="@(() => ShowPopUp())">Create</button>
 </div>
 
 
@@ -40,6 +40,7 @@ else
             <th>Mail</th>
             <th>Phonenumber</th>
             <th>Address</th>
+            <th>Edit</th>
             <th>Delete</th>
         </tr>
         </thead>
@@ -51,6 +52,7 @@ else
                 <td>@worker.Mail</td>
                 <td>@worker.PhoneNumber</td>
                 <td>@worker.Address</td>
+                <td><button @onclick="@(() => ShowPopUp(worker.WorkerId, worker.FirstName,worker.LastName,worker.Mail,worker.PhoneNumber,worker.Address))" disabled="@isButtonDisabled">EDIT</button></td>
                 <td><button id="DeleteButton" @onclick="@(() => DeleteWorker(worker.WorkerId))" disabled="@isButtonDisabled">DELETE</button></td>
             </tr>
         }
@@ -72,7 +74,7 @@ else
     
     <div class="form-group field">
         <label>First name:</label>
-        <input type="text" @bind="firstName"/>
+        <input type="text" @bind="FirstName"/>
     </div>
     
     <div class="form-group field">
@@ -94,7 +96,7 @@ else
         <input type="text" @bind="Address"/>
     </div>
     
-    <button @onclick="@CreateWorker">Create Worker</button>
+    <button @onclick="@CreateOrUpdateWorker" disabled="@isButtonDisabled">Done</button>
     
     @if (!string.IsNullOrEmpty(popUpMsg))
     {
@@ -115,14 +117,16 @@ else
     //Disable button fields
     private bool isButtonDisabled = false;
 
-
+    private int Id = 0;
     //Create a worker text fields
-    private string firstName;
+    private string FirstName;
     private string LastName;
     private string PhoneNumber;
     private string Mail;
     private string Address;
     
+    private bool edit = false;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadWorkers();
@@ -141,15 +145,19 @@ else
         }
     }
 
-    private void ShowPopUp()
+    private void ShowPopUp(int id = 0, string? firstName = "", string? lastName = "", string? mail = "", int? phoneNumber = 0, string? address = "")
     {
         popUpMsg = "";
-        firstName = "";
-        LastName = "";
-        PhoneNumber = "";
-        Mail = "";
-        Address = "";
+        Id = id;
+        FirstName = firstName;
+        LastName = lastName;
+        Mail = mail;
+        PhoneNumber = phoneNumber.ToString();
+        Address = address;
         showPopUp = true;
+        
+    // if firstname already has a value the popup should be an edit
+        edit = !string.IsNullOrEmpty(firstName);
     }
 
     private void ClosePopUp()
@@ -158,11 +166,12 @@ else
         navMgr.NavigateTo("/Workers");
     }
     
-    private async Task CreateWorker()
+    private async Task CreateOrUpdateWorker()
     {
+        isButtonDisabled = true;
         
         popUpMsg = "";
-        if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(LastName) || string.IsNullOrEmpty(PhoneNumber) || string.IsNullOrEmpty(Mail) || string.IsNullOrEmpty(Address))
+        if (string.IsNullOrEmpty(FirstName) || string.IsNullOrEmpty(LastName) || string.IsNullOrEmpty(PhoneNumber) || string.IsNullOrEmpty(Mail) || string.IsNullOrEmpty(Address))
         {
             popUpMsg = "Fields may not be empty";
             return;
@@ -180,19 +189,26 @@ else
         
         try
         {
-            WorkerCreationDto dto = new(firstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
-            Worker worker = await WorkerService.CreateAsync(dto);
+            if (edit)
+            {
+                WorkerUpdateDto dto = new(Id, FirstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
+                await WorkerService.UpdateAsync(dto);
+            }
             
-            /*
-            var list = new List<Worker>(workers!);
-            list.Add(worker);
-            workers = list.AsEnumerable();
-            workers = await WorkerService.GetAsync(null);
-            */
+            else
+            {
+                WorkerCreationDto dto = new(FirstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
+                await WorkerService.CreateAsync(dto);
+            }
+
+            await LoadWorkers();
+            
+            isButtonDisabled = false;
             
             ClosePopUp();
         }
-    catch (Exception e)
+        
+        catch (Exception e)
         {
             Console.WriteLine(e);
             popUpMsg = e.Message;

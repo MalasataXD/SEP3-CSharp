@@ -8,6 +8,7 @@ public interface IWorkerService
  
     Task<Worker> CreateAsync(WorkerCreationDto dto);
     Task<IEnumerable<Worker>> GetAsync(string? nameContains = null);
+    Task UpdateAsync(WorkerUpdateDto dto);
     Task DeleteAsync(int id);
 
 }
