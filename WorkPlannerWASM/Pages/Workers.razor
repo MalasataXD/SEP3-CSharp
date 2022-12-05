@@ -4,6 +4,7 @@
 @using UIComponents
 @using Domain.DTOs.Worker
 @using Domain.DTOs.SearchParameters
+@using System.Reflection.Metadata
 @inject IWorkerService WorkerService
 @inject NavigationManager navMgr
 
@@ -50,7 +51,7 @@ else
                 <td>@worker.Mail</td>
                 <td>@worker.PhoneNumber</td>
                 <td>@worker.Address</td>
-                <td><button @onclick="@(() => DeleteWorker(worker.WorkerId))">DELETE</button></td>
+                <td><button id="DeleteButton" @onclick="@(() => DeleteWorker(worker.WorkerId))" disabled="@isButtonDisabled">DELETE</button></td>
             </tr>
         }
         </tbody>
@@ -110,6 +111,9 @@ else
     private string? nameFilter;
     
     private bool showPopUp;
+    
+    //Disable button fields
+    private bool isButtonDisabled = false;
 
 
     //Create a worker text fields
@@ -197,6 +201,8 @@ else
 
     private async Task DeleteWorker(int id)
     {
+        isButtonDisabled = true;
+        
         msg = "";
         try
         {
@@ -212,12 +218,9 @@ else
         catch (Exception e)
         {
             Console.WriteLine(e);
+            isButtonDisabled = false;
             msg = e.Message;
         }
-        
+        isButtonDisabled = false;
     }
-    
-    
-    
-    
 }
