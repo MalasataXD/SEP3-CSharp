@@ -8,20 +8,18 @@
 @inject IWorkerService WorkerService
 @inject NavigationManager navMgr
 
+
 <h3 style="text-align: center">Overview of all workers</h3>
 
-                <label>Name:</label>
-                <input type="text" @bind="nameFilter"/>
 
-<div>
-    <button @onclick="LoadWorkers">Search</button>
-</div>
-
-<div>
-    <button @onclick="@(() => ShowPopUp())">Create</button>
-</div>
-
-
+    
+    <div class="container">
+        <label>Name:</label>
+        <input type="text" @bind="nameFilter"/>
+        <img class="icon" src="icons/search.png" @onclick="LoadWorkers"/>
+        <img class="icon" id="createButton" src="icons/user-add.png" @onclick="@(() => ShowCreatePopUp())"/>
+    </div>
+    
 
 @if (workers == null)
 {
@@ -33,6 +31,7 @@ else if (!workers.Any())
 }
 else
 {
+
     <table class="table">
         <thead>
         <tr>
@@ -52,8 +51,17 @@ else
                 <td>@worker.Mail</td>
                 <td>@worker.PhoneNumber</td>
                 <td>@worker.Address</td>
-                <td><button @onclick="@(() => ShowPopUp(worker.WorkerId, worker.FirstName,worker.LastName,worker.Mail,worker.PhoneNumber,worker.Address))" disabled="@isButtonDisabled">EDIT</button></td>
-                <td><button id="DeleteButton" @onclick="@(() => DeleteWorker(worker.WorkerId))" disabled="@isButtonDisabled">DELETE</button></td>
+                
+                @if (isButtonDisabled)
+                {
+                    <td><img style="visibility: hidden" class="icon" src="icons/edit.png" @onclick="@(() => ShowCreatePopUp(worker.WorkerId, worker.FirstName,worker.LastName,worker.Mail,worker.PhoneNumber,worker.Address))"/></td>
+                    <td><img style="visibility: hidden" class="icon" src="icons/delete.png" @onclick="@(() => DeleteWorker(worker.WorkerId))"/>  </td>
+                }
+                else
+                {
+                    <td><img class="icon" src="icons/edit.png" @onclick="@(() => ShowCreatePopUp(worker.WorkerId, worker.FirstName, worker.LastName, worker.Mail, worker.PhoneNumber, worker.Address))"/></td>
+                    <td><img class="icon" src="icons/delete.png" @onclick="@(() => {Id = worker.WorkerId; ShowDeleteConfirmationPopUp(); })"/>  </td>
+                }
             </tr>
         }
         </tbody>
@@ -66,10 +74,10 @@ else
 }
 
 
-<PopUp ShowPopUp="showPopUp">
+<PopUp ShowPopUp="showCreatePopUp">
 
 
-        <button @onclick="@ClosePopUp">Exit</button>
+    <button @onclick="@CloseCreatePopUp">Exit</button>
 
     
     <div class="form-group field">
@@ -104,6 +112,13 @@ else
     }
 </PopUp>
 
+<PopUp ShowPopUp="showDeleteConfirmationPopUp">
+    <h3>Are you sure you want to delete this</h3>
+        
+    <button @onclick="@(e => DeleteWorker(Id))">Yes</button>
+    <button @onclick="CloseDeleteConfirmationPopUp">No</button>
+</PopUp>
+
 
 @code {
     private IEnumerable<Worker>? workers;
@@ -112,7 +127,8 @@ else
 
     private string? nameFilter;
     
-    private bool showPopUp;
+    private bool showCreatePopUp;
+    private bool showDeleteConfirmationPopUp;
     
     //Disable button fields
     private bool isButtonDisabled = false;
@@ -145,7 +161,7 @@ else
         }
     }
 
-    private void ShowPopUp(int id = 0, string? firstName = "", string? lastName = "", string? mail = "", int? phoneNumber = 0, string? address = "")
+    private void ShowCreatePopUp(int id = 0, string? firstName = "", string? lastName = "", string? mail = "", int? phoneNumber = 0, string? address = "")
     {
         popUpMsg = "";
         Id = id;
@@ -154,16 +170,24 @@ else
         Mail = mail;
         PhoneNumber = phoneNumber.ToString();
         Address = address;
-        showPopUp = true;
+        showCreatePopUp = true;
         
     // if firstname already has a value the popup should be an edit
         edit = !string.IsNullOrEmpty(firstName);
     }
 
-    private void ClosePopUp()
+    private void CloseCreatePopUp()
     {
-        showPopUp = false;
-        navMgr.NavigateTo("/Workers");
+        showCreatePopUp = false;
+    }
+
+    private void ShowDeleteConfirmationPopUp()
+    {
+        showDeleteConfirmationPopUp = true;
+    }
+    private void CloseDeleteConfirmationPopUp()
+    {
+        showDeleteConfirmationPopUp = false;
     }
     
     private async Task CreateOrUpdateWorker()
@@ -173,6 +197,7 @@ else
         popUpMsg = "";
         if (string.IsNullOrEmpty(FirstName) || string.IsNullOrEmpty(LastName) || string.IsNullOrEmpty(PhoneNumber) || string.IsNullOrEmpty(Mail) || string.IsNullOrEmpty(Address))
         {
+            isButtonDisabled = false;
             popUpMsg = "Fields may not be empty";
             return;
         }
@@ -183,6 +208,7 @@ else
         }
         catch (Exception e)
         {
+            isButtonDisabled = false;
             popUpMsg = "Phonenumber may only contain numbers";
             return;
         }
@@ -205,11 +231,12 @@ else
             
             isButtonDisabled = false;
             
-            ClosePopUp();
+            CloseCreatePopUp();
         }
         
         catch (Exception e)
         {
+            isButtonDisabled = false;
             Console.WriteLine(e);
             popUpMsg = e.Message;
         }
@@ -234,6 +261,7 @@ else
             
             isButtonDisabled = false;
 
+            CloseDeleteConfirmationPopUp();
         }
         catch (Exception e)
         {

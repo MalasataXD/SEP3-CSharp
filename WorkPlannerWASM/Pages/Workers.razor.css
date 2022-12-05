@@ -1,0 +1,14 @@
+#createButton{
+margin-left: 62%;
+}
+
+.container{
+    display: flex;
+    flex-direction: row;
+}
+
+
+.icon {
+    width: 30px;
+    cursor: pointer;
+}
