@@ -12,7 +12,7 @@ public class WorkShiftUpdateDto
     public string? BreakAmount{get; set; } // ? How much break the worker has ex. 15 min
     
     // ¤ Constructor
-    public WorkShiftUpdateDto(int shiftId, int? workerId, string? date, string? fromTime, string toTime, string? breakAmount)
+    public WorkShiftUpdateDto(int shiftId, int? workerId, string? date, string? fromTime, string? toTime, string? breakAmount)
     {
         ShiftId = shiftId;
         WorkerId = workerId;

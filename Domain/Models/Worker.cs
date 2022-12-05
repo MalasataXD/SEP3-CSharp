@@ -20,7 +20,11 @@ public class Worker
         Mail = mail;
         Address = address;
     }
-    
+
+    public Worker()
+    {
+    }
+
     public string getFullName()
     {
         return FirstName + " " + LastName;

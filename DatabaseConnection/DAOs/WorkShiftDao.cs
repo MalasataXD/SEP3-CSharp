@@ -12,11 +12,13 @@ public class WorkShiftDao : IWorkShiftDao
 {
     private readonly Sender sender;
     private readonly Receiver receiver;
+    private readonly IWorkerDao workerDao;
 
-    public WorkShiftDao(Sender sender, Receiver receiver)
+    public WorkShiftDao(Sender sender, Receiver receiver, IWorkerDao workerDao)
     {
         this.sender = sender;
         this.receiver = receiver;
+        this.workerDao = workerDao;
     }
 
     public async Task<WorkShift> CreateAsync(WorkShift shift)
@@ -52,18 +54,24 @@ public class WorkShiftDao : IWorkShiftDao
             sender.GetShiftBySearchParameters(new SearchShiftParametersJavaDto(searchParameters));
 
             object obj = await receiver.Receive("GetShiftBySearchParameters");
-            Console.WriteLine("From server obj: " + obj);
-            
-            List<ShiftJavaDto>? dto = JsonSerializer.Deserialize<List<ShiftJavaDto>>((JsonElement)obj);
 
-            Console.WriteLine(dto);
+            List<ShiftJavaDto>? dto = JsonSerializer.Deserialize<List<ShiftJavaDto>>((JsonElement)obj);
+            
             List<WorkShift> result = new List<WorkShift>();
 
+            int oldItemWorkerId = 0;
             foreach (var item in dto)
             {
-                Worker worker = new Worker(null, null, 0, null, null);
-                worker.WorkerId = item.workerId;
-                
+                Worker worker = new Worker("","",1,"","");
+
+                Console.WriteLine(oldItemWorkerId + " != " + item.workerId);
+                if (oldItemWorkerId != item.workerId)
+                {
+                    worker = await workerDao.GetByIdAsync(item.workerId);
+                }
+
+                oldItemWorkerId = item.workerId;
+
                 WorkShift workShift = new WorkShift(
                     item.date,
                     $"{item.fromHour}:{item.fromMinute}",
@@ -122,6 +130,7 @@ public class WorkShiftDao : IWorkShiftDao
     {
         try
         {
+            Console.WriteLine("toUpdate shift : " + toUpdate.BreakAmount);
             Console.WriteLine(JsonSerializer.Serialize(toUpdate));
             sender.EditShift(toUpdate);
 

@@ -36,7 +36,12 @@ public class Receiver
             Thread.Sleep(100);
             object newValue;
             map.TryGetValue(key, out newValue);
+            
             if (oldValue != newValue)
+            {
+                return newValue;
+            }
+            if (oldValue != null && !oldValue.Equals(newValue))
             {
                 return newValue;
             }
@@ -66,7 +71,17 @@ public class Receiver
                 
                 Console.WriteLine(messageHeader.payload + " Class: " + messageHeader.payload.GetType());
                 
-                map.Add(messageHeader.action, messageHeader.payload);
+                object val;
+                if (map.TryGetValue(messageHeader.action, out val))
+                {
+                    // yay, value exists!
+                    map[messageHeader.action] =  messageHeader.payload;
+                }
+                else
+                {
+                    // darn, lets add the value
+                    map.Add(messageHeader.action, messageHeader.payload);
+                }
             };
             channel.BasicConsume(queue: QueueName,
                 autoAck: true,

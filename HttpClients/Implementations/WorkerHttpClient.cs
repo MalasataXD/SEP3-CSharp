@@ -17,7 +17,7 @@ public class WorkerHttpClient : IWorkerService
 
     public async Task<Worker> CreateAsync(WorkerCreationDto dto)
     {
-        HttpResponseMessage response = await client.PostAsJsonAsync("/worker", dto);
+        HttpResponseMessage response = await client.PostAsJsonAsync("/Worker", dto);
         string result = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)
         {
@@ -30,7 +30,7 @@ public class WorkerHttpClient : IWorkerService
 
     public async Task<IEnumerable<Worker>> GetAsync(string? nameContains = null)
     {
-        string uri = "/worker";
+        string uri = "/Worker";
         if (!string.IsNullOrEmpty(nameContains))
         {
             uri += $"?workerName={nameContains}";

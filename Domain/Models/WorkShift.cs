@@ -34,5 +34,8 @@ public class WorkShift
         BreakAmount = breakAmountToUse;
         BossId = bossId;
     }
-    
+
+    public WorkShift()
+    {
+    }
 }

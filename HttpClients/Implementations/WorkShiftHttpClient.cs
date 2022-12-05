@@ -18,7 +18,7 @@ public class WorkShiftHttpClient : IWorkShiftService
     }
     public async Task<WorkShift> CreateAsync(WorkShiftCreationDto dto)
     {
-        HttpResponseMessage response = await client.PostAsJsonAsync("/workShift", dto);
+        HttpResponseMessage response = await client.PostAsJsonAsync("/WorkShift", dto);
         string result = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)
         {
@@ -31,25 +31,24 @@ public class WorkShiftHttpClient : IWorkShiftService
 
     public async Task<IEnumerable<WorkShift>> GetAsync(string? date = null, string? workerName = null)
     {
-        string uri = "";
-        
+        string uri = "/WorkShift";
         if (!string.IsNullOrEmpty(date))
         {
-            uri = $"/workShift?date={date}";
+            uri += $"?date={date}";
         }
+
         if (!string.IsNullOrEmpty(workerName))
         {
-
-            if (string.IsNullOrEmpty(uri))
-            {
-                uri = $"/workShift?workerName={workerName}";
-            }
-            else
+            if (date != null)
             {
                 uri += $"&workerName={workerName}";
             }
+            else
+            {
+                uri += $"?workerName={workerName}";
+            }
         }
-        
+
         HttpResponseMessage response = await client.GetAsync(uri);
         string result = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)
@@ -69,7 +68,7 @@ public class WorkShiftHttpClient : IWorkShiftService
         string dtoAsJson = JsonSerializer.Serialize(dto);
         StringContent body = new StringContent(dtoAsJson, Encoding.UTF8, "application/json");
 
-        HttpResponseMessage response = await client.PatchAsync("/workShift", body);
+        HttpResponseMessage response = await client.PatchAsync("/WorkShift", body);
         if (!response.IsSuccessStatusCode)
         {
             string content = await response.Content.ReadAsStringAsync();

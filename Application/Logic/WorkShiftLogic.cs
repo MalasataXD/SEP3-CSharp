@@ -55,7 +55,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         {
             throw new Exception("Workshift does not exist!");
         }
-
+        
         Worker? worker = null;
         if (toUpdate.WorkerId != null)
         {
@@ -79,6 +79,7 @@ public class WorkShiftLogic : IWorkShiftLogic
          //await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);
 
         await _WorkShiftDao.UpdateAsync(updatedWorkShift);
+        
     }
 
     public async Task DeleteAsync(int shiftId)
