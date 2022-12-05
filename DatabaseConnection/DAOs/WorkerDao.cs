@@ -46,9 +46,39 @@ public class WorkerDao : IWorkerDao
         }
     }
 
-    public Task<IEnumerable<Worker>> GetAsync(SearchWorkerParametersDto searchParameters)
+    public async Task<IEnumerable<Worker>> GetAsync(SearchWorkerParametersDto searchParameters)
     {
-        throw new NotImplementedException();
+        try
+        {
+            sender.GetWorkerBySearchParameters(new SearchWorkerParametersJavaDto(searchParameters));
+
+            object obj = await receiver.Receive("GetWorkerBySearchParameters");
+            Console.WriteLine("From server obj: " + obj);
+            
+            List<WorkerJavaDto>? dto = JsonSerializer.Deserialize<List<WorkerJavaDto>>((JsonElement)obj);
+
+            Console.WriteLine(dto);
+            List<Worker> result = new List<Worker>();
+
+            foreach (var item in dto)
+            {
+                Worker worker = new Worker(
+                    item.firstName,
+                    item.lastName,
+                    item.phoneNumber,
+                    item.mail,
+                    item.address
+                );
+                worker.WorkerId = item.workerId; 
+                result.Add(worker);
+            }
+            return result.AsEnumerable();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not get worker");
+        }
     }
 
     public async Task<Worker> GetByIdAsync(int workerId)
@@ -62,8 +92,6 @@ public class WorkerDao : IWorkerDao
             
             WorkerJavaDto? dto = JsonSerializer.Deserialize<WorkerJavaDto>((JsonElement)obj);
             
-            Console.WriteLine("From server id: " + dto.workerId);
-            Console.WriteLine("From server name: " + dto.firstName);
             Worker worker = new Worker(
                 dto.firstName,
                 dto.lastName,
@@ -82,9 +110,33 @@ public class WorkerDao : IWorkerDao
         }
     }
 
-    public Task<Worker> GetByFullNameAsync(string fullName)
+    public async Task<Worker> GetByFullNameAsync(string fullName)
     {
-        throw new NotImplementedException();
+        try
+        {
+            sender.GetWorkerByFullName(fullName);
+
+            object obj = await receiver.Receive("GetWorkerByFullName");
+            Console.WriteLine("From server obj: " + obj);
+            
+            WorkerJavaDto? dto = JsonSerializer.Deserialize<WorkerJavaDto>((JsonElement)obj);
+            
+            Worker worker = new Worker(
+                dto.firstName,
+                dto.lastName,
+                dto.phoneNumber,
+                dto.mail,
+                dto.address
+            );
+            worker.WorkerId = dto.workerId;
+
+            return worker;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not get worker");
+        }
     }
 
     public async Task<Worker> UpdateAsync(Worker toUpdate)

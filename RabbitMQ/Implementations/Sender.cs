@@ -44,6 +44,17 @@ public class Sender : ISender
         FormatAndSend("GetWorkerById", workerId);
     }
 
+    public void GetWorkerByFullName(String fullName)
+    {
+        FormatAndSend("GetWorkerByFullName", fullName);
+    }
+
+    public void GetWorkerBySearchParameters(SearchWorkerParametersJavaDto dto)
+    {
+        FormatAndSend("GetWorkerBySearchParameters", dto);
+    }
+
+
     //Shift methods
     public void CreateShift(WorkShift toSend)
     {
@@ -63,6 +74,11 @@ public class Sender : ISender
     public void GetShiftById(int shiftId)
     {
         FormatAndSend("GetShiftById", shiftId);
+    }
+
+    public void GetShiftBySearchParameters(SearchShiftParametersJavaDto dto)
+    {
+        FormatAndSend("GetShiftBySearchParameters", dto);
     }
 
     private void FormatAndSend(string Queue, object payload)

@@ -45,9 +45,44 @@ public class WorkShiftDao : IWorkShiftDao
         }
     }
 
-    public Task<IEnumerable<WorkShift>> GetAsync(SearchShiftParametersDto searchParameters)
+    public async Task<IEnumerable<WorkShift>> GetAsync(SearchShiftParametersDto searchParameters)
     {
-        throw new NotImplementedException();
+        try
+        {
+            sender.GetShiftBySearchParameters(new SearchShiftParametersJavaDto(searchParameters));
+
+            object obj = await receiver.Receive("GetShiftBySearchParameters");
+            Console.WriteLine("From server obj: " + obj);
+            
+            List<ShiftJavaDto>? dto = JsonSerializer.Deserialize<List<ShiftJavaDto>>((JsonElement)obj);
+
+            Console.WriteLine(dto);
+            List<WorkShift> result = new List<WorkShift>();
+
+            foreach (var item in dto)
+            {
+                Worker worker = new Worker(null, null, 0, null, null);
+                worker.WorkerId = item.workerId;
+                
+                WorkShift workShift = new WorkShift(
+                    item.date,
+                    $"{item.fromHour}:{item.fromMinute}",
+                    $"{item.toHour}:{item.toMinute}",
+                    worker,
+                    item.breakAmount.ToString(),
+                    item.bossId.ToString()
+                );
+                workShift.ShiftId = item.shiftId;
+                
+                result.Add(workShift);
+            }
+            return result.AsEnumerable();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not get worker");
+        }
     }
     
     public async Task<WorkShift?> GetByIdAsync(int shiftId)

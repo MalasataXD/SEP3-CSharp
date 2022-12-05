@@ -12,9 +12,6 @@ public class Receiver
     private string HostName;
     private string Id;
     private static string QueueName;
-
-
-    //Oof
     private static Dictionary<string, object> map;
     
     public Receiver()
@@ -69,7 +66,6 @@ public class Receiver
                 
                 Console.WriteLine(messageHeader.payload + " Class: " + messageHeader.payload.GetType());
                 
-                //virker nok ikke
                 map.Add(messageHeader.action, messageHeader.payload);
             };
             channel.BasicConsume(queue: QueueName,
