@@ -139,9 +139,9 @@
                                        @foreach (var workShift in _workShifts)
                                        {
                                            string date = $"{dateTime.Day}-{dateTime.Month}-{dateTime.Year}";
-                   
-                   
+
                                            times++;
+                                           
                                            if (workShift.Worker.WorkerId == worker.WorkerId && string.Equals(date, workShift.Date))
                                            {
                                                <td>
@@ -326,26 +326,8 @@
     
     private async Task<List<WorkShift>> GetWorkShifts()
     {
-        DateTime dt = dateTime;
-
-        for (int i = 0; i < 7; i++)
-        {
-            string date = $"{dt.Day}-{dt.Month}-{dt.Year}";
-
-
-            if (i == 0) //setup should declare workShifts before
-            {
-                IEnumerable<WorkShift> temp = await WorkShiftService.GetAsync(date);
-                workShifts = temp.ToList();
-            }
-            else
-            {
-
-                foreach (var workShift in await WorkShiftService.GetAsync(date))
-                    workShifts.Add(workShift);
-            }
-            dt = dt.AddDays(1);
-        }
+        IEnumerable<WorkShift> temp = await WorkShiftService.GetAsync();
+        workShifts = temp.ToList();
 
         return workShifts;
     }
