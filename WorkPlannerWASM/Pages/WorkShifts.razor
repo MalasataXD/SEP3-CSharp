@@ -277,7 +277,6 @@
     private DateTime dateTime = DateTime.Today;
     private int weekNumber;
     private int year;
-    private int month;
 
     // should be deleteable if call async method in body
     // other alternative array in array?
@@ -300,7 +299,6 @@
         
           weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
           year = dateTime.Year;
-          month = dateTime.Month;
 
          await UpdateSchema();
 
@@ -375,7 +373,6 @@
         
         weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         year = dateTime.Year;
-        month = dateTime.Month;
 
         if (selectedUserId != 0)
         {

@@ -31,7 +31,7 @@ public class WorkShiftLogic : IWorkShiftLogic
 
         WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount, toCreate.BossId);
         
-        //await ValidateWorkShift(workShift);
+        await ValidateWorkShift(workShift);
             
         return await _WorkShiftDao.CreateAsync(workShift);
     }
@@ -76,7 +76,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         WorkShift updatedWorkShift = new(dateToUse, fromTimeToUse, toTimeToUse, workerToUse, breakAmountToUse, "1");
         updatedWorkShift.ShiftId = workShift.ShiftId;
         
-         //await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);
+         await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);
 
         await _WorkShiftDao.UpdateAsync(updatedWorkShift);
         
@@ -84,13 +84,12 @@ public class WorkShiftLogic : IWorkShiftLogic
 
     public async Task DeleteAsync(int shiftId)
     {
-        /*
+        
         WorkShift? workShift = await _WorkShiftDao.GetByIdAsync(shiftId);
         if (workShift == null)
         {
             throw new Exception("Workshift does not exist!");
         }
-        */
 
         await _WorkShiftDao.DeleteAsync(shiftId);
     }
@@ -111,16 +110,26 @@ public class WorkShiftLogic : IWorkShiftLogic
             shifts = shifts.Where(shift => shift.ShiftId != workShiftId).ToList();
         }
         
-        IsWorkerOccupied(workShift.Worker.WorkerId, workShift.Date, workShift.FromTime, workShift.ToTime,shifts);
+        IsWorkerOccupied(workShift.Worker.WorkerId, workShift.Date, shifts);
     }
 
     private void ValidateDate(string date)
     {
-        string[] temp = date.Split("/");
-        
-        // todo add methods: how many days in month + isLeapYear + more??
-        // ? prob use DateTime class ?
+        try
+        {
+            string[] temp = date.Split("-",3);
+            
+            if (DateTime.DaysInMonth(Int32.Parse(temp[2]),Int32.Parse(temp[1])) < Int32.Parse(temp[0]))
+            {
+                throw new Exception("Date does not exist");
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Invalid date format");
+        }
     }
+
 
     private void ValidateTime(string time)
     {
@@ -160,48 +169,17 @@ public class WorkShiftLogic : IWorkShiftLogic
         }
     }
 
-    private void IsWorkerOccupied(int id, string date, string fromTime, string toTime,IEnumerable<WorkShift>  shifts)
+    private void IsWorkerOccupied(int id, string date ,IEnumerable<WorkShift>  workShifts)
     {
-        SearchShiftParametersDto dto = new (date,null);
-        IEnumerable<WorkShift> workShifts = shifts;
-        int fromTimeMinutes = TimeToMinutes(fromTime);
-        int toTimeMinutes = TimeToMinutes(toTime);
-        Boolean throwExeception = false;
-        WorkShift foundShift = null;
-        
-        
         foreach (var workShift in workShifts)
         {
-            if (id == workShift.Worker.WorkerId)
+            if (id == workShift.Worker.WorkerId && string.Equals(date,workShift.Date))
             {
-                if (fromTimeMinutes <= TimeToMinutes(workShift.FromTime) && TimeToMinutes(workShift.FromTime) <= toTimeMinutes)
-                {
-                    throwExeception = true;
-                    foundShift = workShift;
-                    break;
-                }
-
-                if (fromTimeMinutes <= TimeToMinutes(workShift.ToTime) && TimeToMinutes(workShift.ToTime) <= toTimeMinutes)
-                {
-                    throwExeception = true;
-                    foundShift = workShift;
-                    break;
-                }
-
-                if (TimeToMinutes(workShift.FromTime) <= fromTimeMinutes && toTimeMinutes <= TimeToMinutes(workShift.ToTime))
-                {
-                    throwExeception = true;
-                    foundShift = workShift;
-                    break;
-                }
+                throw new Exception($"{workShift.Worker.getFullName()} already has a shift at that date!");
             }
         }
-
-        if (throwExeception)
-        {
-            throw new Exception($"{foundShift.Worker.getFullName()} already has a shift at that time!");
-        }
     }
+
 
     private int TimeToMinutes(string time)
     {

@@ -23,15 +23,7 @@ public class WorkerLogic : IWorkerLogic
         Worker worker = new Worker(toCreate.FirstName, toCreate.LastName, toCreate.PhoneNumber, toCreate.Mail,
             toCreate.Address);
         
-        ValidateWorker(worker);
-    
-        /*
-        Worker? exists = await _workerDao.GetByFullNameAsync(worker.getFullName());
-        if (exists != null)
-        {
-            throw new Exception("Worker already exists!");
-        }
-        */
+        await ValidateWorker(worker);
         
         return await _workerDao.CreateAsync(worker);
     }
@@ -59,7 +51,7 @@ public class WorkerLogic : IWorkerLogic
             Worker updatedWorker = new(firstName, lastName,phoneNumber,mail,adress);
             updatedWorker.WorkerId = worker.WorkerId;
 
-            //ValidateWorker(updatedWorker);
+            await ValidateWorker(updatedWorker);
             
             await _workerDao.UpdateAsync(updatedWorker);
         }    
@@ -78,16 +70,20 @@ public class WorkerLogic : IWorkerLogic
         await _workerDao.DeleteAsync(workerId);
     }
 
-    private void ValidateWorker(Worker worker)
+    private async Task ValidateWorker(Worker worker)
     {
+
+        SearchWorkerParametersDto dto = new("");
+        IEnumerable<Worker> workers = await _workerDao.GetAsync(dto);
+
         //todo add unitTesting!
-        ValidateName(worker.FirstName, worker.LastName);
-        ValidateMail(worker.Mail);
-        ValidatePhoneNumber(worker.PhoneNumber);
+        ValidateName(worker.FirstName, worker.LastName, workers, worker.WorkerId);
+        ValidateMail(worker.Mail, workers, worker.WorkerId);
+        ValidatePhoneNumber(worker.PhoneNumber, workers, worker.WorkerId);
         ValidateAddress(worker.Address);
     }
 
-    private void ValidateName(string firstName, string lastName)
+    private void ValidateName(string firstName, string lastName, IEnumerable<Worker> workers, int workerId)
     {
         string[] lastNames = lastName.Split(" ");
         
@@ -103,16 +99,33 @@ public class WorkerLogic : IWorkerLogic
                 throw new Exception("Lastname may only contain letters");
             }
         }
+
+        foreach (var worker in workers)
+        {
+            if (string.Equals(worker.getFullName(),firstName + " " + lastName) && workerId != worker.WorkerId)
+            {
+                throw new Exception("Two employees cannot have the same name");
+            }
+        }
         
     }
-    private void ValidatePhoneNumber(int phoneNumber)
+    private void ValidatePhoneNumber(int phoneNumber, IEnumerable<Worker> workers, int workerId)
     {
         if (phoneNumber.ToString().Length != 8)
         {
             throw new Exception("Phonenumber needs to be 8 numbers long");
         }
+        
+        foreach (var worker in workers)
+        {
+            if (phoneNumber == worker.PhoneNumber && worker.WorkerId != workerId)
+            {
+                throw new Exception("Two employees cannot have the same phonenumber");
+            }
+        }
+        
     }
-    private void ValidateMail(string mail)
+    private void ValidateMail(string mail, IEnumerable<Worker> workers, int workerId)
     {
         try
         {
@@ -129,6 +142,15 @@ public class WorkerLogic : IWorkerLogic
         {
             throw new Exception("Invalid mail");
         }
+        
+        foreach (var worker in workers)
+        {
+            if (string.Equals(worker.Mail,mail) && worker.WorkerId != workerId)
+            {
+                throw new Exception("Two employees cannot have the same mail");
+            }
+        }
+        
     }
     private void ValidateAddress(string address)
     {
