@@ -60,16 +60,15 @@ public class WorkShiftDao : IWorkShiftDao
             List<WorkShift> result = new List<WorkShift>();
 
             int oldItemWorkerId = 0;
+            Worker worker = new Worker("","",0,"","");
             foreach (var item in dto)
             {
-                Worker worker = new Worker("","",1,"","");
-
+                
                 Console.WriteLine(oldItemWorkerId + " != " + item.workerId);
                 if (oldItemWorkerId != item.workerId)
                 {
                     worker = await workerDao.GetByIdAsync(item.workerId);
                 }
-
                 oldItemWorkerId = item.workerId;
 
                 WorkShift workShift = new WorkShift(
