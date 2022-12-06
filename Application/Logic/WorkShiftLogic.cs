@@ -31,8 +31,6 @@ public class WorkShiftLogic : IWorkShiftLogic
 
         WorkShift workShift = new(toCreate.Date, toCreate.FromTime, toCreate.ToTime, worker, toCreate.BreakAmount, toCreate.BossId);
         
-        await ValidateWorkShift(workShift);
-            
         return await _WorkShiftDao.CreateAsync(workShift);
     }
 
@@ -76,8 +74,6 @@ public class WorkShiftLogic : IWorkShiftLogic
         WorkShift updatedWorkShift = new(dateToUse, fromTimeToUse, toTimeToUse, workerToUse, breakAmountToUse, "1");
         updatedWorkShift.ShiftId = workShift.ShiftId;
         
-         await ValidateWorkShift(updatedWorkShift, updatedWorkShift.ShiftId);
-
         await _WorkShiftDao.UpdateAsync(updatedWorkShift);
         
     }
@@ -94,25 +90,18 @@ public class WorkShiftLogic : IWorkShiftLogic
         await _WorkShiftDao.DeleteAsync(shiftId);
     }
 
-
-    private async Task ValidateWorkShift(WorkShift workShift, int? workShiftId = 0)
+    public void ValidateAsync(WorkShiftValidateDto toValidate)
     {
         //todo check for absence
         //todo add unitTesting!
-        ValidateDate(workShift.Date);
-        ValidateTime(workShift.FromTime); 
-        ValidateTime(workShift.ToTime);
-        ValidateTimes(workShift.FromTime, workShift.ToTime);
-        IEnumerable<WorkShift> shifts = await _WorkShiftDao.GetAsync(new SearchShiftParametersDto(workShift.Date,null));
+        ValidateDate(toValidate.Date);
+        ValidateTime(toValidate.FromTime); 
+        ValidateTime(toValidate.ToTime);
+        ValidateTimes(toValidate.FromTime, toValidate.ToTime);
 
-        if (workShiftId != 0)
-        {
-            shifts = shifts.Where(shift => shift.ShiftId != workShiftId).ToList();
-        }
-        
-        IsWorkerOccupied(workShift.Worker.WorkerId, workShift.Date, shifts);
+        IsWorkerOccupied(toValidate.WorkerId, toValidate.Date, toValidate.WorkShifts);
     }
-
+    
     private void ValidateDate(string date)
     {
         try
@@ -133,7 +122,6 @@ public class WorkShiftLogic : IWorkShiftLogic
 
     private void ValidateTime(string time)
     {
-
         try
         {
             string[] timeSplit = time.Split(":", 2);

@@ -71,7 +71,7 @@ public class WorkShiftController : ControllerBase
     
     // ¤ Delete WorkShift
     [HttpDelete("{id:int}")]
-    public async Task<ActionResult> DeleteAsync([FromRoute] int id)
+    public async Task<ActionResult<bool>> DeleteAsync([FromRoute] int id)
     {
         try
         {
@@ -84,9 +84,21 @@ public class WorkShiftController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
-
-
-
-
-
+    
+    // ¤ Validate WorkShift
+    [HttpPost("Validate")]
+    public async Task<ActionResult> ValidateAsync(WorkShiftValidateDto dto)
+    {
+        try
+        {
+            _workShiftLogic.ValidateAsync(dto);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
 }

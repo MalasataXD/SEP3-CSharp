@@ -22,7 +22,7 @@
 {
     <div class="form-group field">
         <label>Worker:</label>
-        <select @bind-value="selectedUserId" @onchange="UpdateSchema" @bind-value:event="oninput">
+        <select @bind-value="selectedUserId" @bind-value:event="oninput">
             <option value="-1">Everyone</option>
             @foreach (Worker worker in workers)
             {
@@ -84,7 +84,7 @@
                         if (workShift.Worker.WorkerId == selectedUserId && string.Equals(date, workShift.Date))
                         {
                             <td>
-                                <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                                <button class="card" @onclick="@(e => { ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount); editedWorkShift = workShift;})">
                                     <WorkShiftComponent fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
                                 </button>
                             </td>
@@ -145,7 +145,7 @@
                                            if (workShift.Worker.WorkerId == worker.WorkerId && string.Equals(date, workShift.Date))
                                            {
                                                <td>
-                                                   <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
+                                                   <button class="card" @onclick="@(e => { ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount); editedWorkShift = workShift;})">
                                                        <WorkShiftComponent fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
                                                    </button>
                                                </td>
@@ -257,7 +257,9 @@
     private int selectedUserId = -1;
 
     private IEnumerable<Worker>? workers;
-    private List<WorkShift>? workShifts;
+    private IEnumerable<WorkShift>? _workShifts;
+
+    
     private string msg = "";
     private string popUpMsg = "";
     private bool showCreatePopUp;
@@ -273,17 +275,15 @@
     private string breakAmount;
     private string shiftId;
     private string workerId;
+
+    //The WorkShift that is currently being edited
+    private WorkShift? editedWorkShift;
+
     
     private DateTime dateTime = DateTime.Today;
     private int weekNumber;
     private int year;
-
-    // should be deleteable if call async method in body
-    // other alternative array in array?
-
-
     
-    private IEnumerable<WorkShift>? _workShifts;
 
 
     protected override async Task OnInitializedAsync()
@@ -295,12 +295,11 @@
             dateTime = dateTime.AddDays(-1);
         }
 
-        Console.WriteLine(dateTime.Date.ToString() + "llo");
         
-          weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-          year = dateTime.Year;
+        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        year = dateTime.Year;
 
-         await UpdateSchema();
+        await UpdateSchema();
 
     }
     
@@ -319,18 +318,9 @@
     
     private async Task UpdateSchema()
     {
-        _workShifts = await GetWorkShifts();
+        _workShifts = await WorkShiftService.GetAsync();
     }
-    
-    private async Task<List<WorkShift>> GetWorkShifts()
-    {
-        IEnumerable<WorkShift> temp = await WorkShiftService.GetAsync();
-        workShifts = temp.ToList();
 
-        return workShifts;
-    }
-    
-    
     private async Task CreateWorkShift()
     {
         popUpMsg = "";
@@ -342,16 +332,25 @@
         
         try
         {
-            WorkShiftCreationDto dto = new(date, fromTime, toTime, selectedUserId ,breakAmount, "1");
+            // WorkShiftCreationDto dto = new(date, fromTime, toTime, selectedUserId ,breakAmount, "1");
+            //
+            // WorkShift workShift = await WorkShiftService.CreateAsync(dto);
 
-            WorkShift workShift = await WorkShiftService.CreateAsync(dto);
+            WorkShiftValidateDto dto = new WorkShiftValidateDto(date, fromTime, toTime, selectedUserId, breakAmount, _workShifts);
             
-            //todo add workshift to schema without calling webapi
-            await UpdateSchema();
+            await WorkShiftService.ValidateAsync(dto);
+
+            Worker worker = workers.ToList().Find(worker => worker.WorkerId == selectedUserId);
+            WorkShift workShift = new WorkShift(date, fromTime, toTime, worker, breakAmount,"1");
             
+            List<WorkShift> workShifts = _workShifts.ToList();
+
+            workShifts.Add(workShift);
+
+            _workShifts = workShifts.AsEnumerable();
             
             CloseCreatePopUp();
-        }
+        } 
         catch (Exception e)
         {
             Console.WriteLine(e);
@@ -373,11 +372,7 @@
         
         weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         year = dateTime.Year;
-
-        if (selectedUserId != 0)
-        {
-            await UpdateSchema();
-        }
+        
     }
     
     private async Task UpdateWorkShift()
@@ -391,14 +386,27 @@
         
         try
         {
-            WorkShiftUpdateDto dto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
+            // WorkShiftUpdateDto dto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
+            // await WorkShiftService.UpdateAsync(dto);
+            
+            Worker worker = workers.ToList().Find(worker => worker.WorkerId == Int32.Parse(workerId));
+            WorkShift shift = new WorkShift(date, fromTime, toTime, worker, breakAmount,"1");
+            shift.ShiftId = Int32.Parse(shiftId);
+            
+            
+            List<WorkShift> workShifts = _workShifts.ToList();
 
-            await WorkShiftService.UpdateAsync(dto);
+            int index = workShifts.FindIndex(shift => shift.Worker.WorkerId == editedWorkShift.Worker.WorkerId && string.Equals(shift.Date, editedWorkShift.Date));
+
+            workShifts.RemoveAt(index);
             
-    //todo add workshift to schema without calling webapi
-            await UpdateSchema();
+            WorkShiftValidateDto dto = new WorkShiftValidateDto(date, fromTime, toTime, Int32.Parse(workerId), breakAmount, workShifts);
+            await WorkShiftService.ValidateAsync(dto);
+
+            workShifts.Add(shift);
             
-            
+            _workShifts = workShifts.AsEnumerable();
+
             CloseWorkShiftPopUp();
         }
         catch (Exception e)
@@ -410,10 +418,20 @@
 
     private async Task DeleteWorkShift()
     {
-        await WorkShiftService.DeleteAsync(Int32.Parse(shiftId));
-        await UpdateSchema();
+        List<WorkShift> workShifts = _workShifts.ToList();
+        
+        int index = workShifts.FindIndex(shift => shift.Worker.WorkerId == editedWorkShift.Worker.WorkerId && string.Equals(shift.Date, editedWorkShift.Date));
         CloseDeleteConfirmationPopUp();
-        CloseWorkShiftPopUp();
+
+        if (workShifts.Remove(workShifts[index]))
+        {
+            CloseWorkShiftPopUp();
+            _workShifts = workShifts.ToList();
+        }
+        else
+        {
+            popUpMsg = "The workshift you are trying to delete does not exist!";
+        }
     }
     
     

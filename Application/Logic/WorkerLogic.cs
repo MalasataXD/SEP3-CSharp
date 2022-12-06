@@ -54,9 +54,7 @@ public class WorkerLogic : IWorkerLogic
             await ValidateWorker(updatedWorker);
             
             await _workerDao.UpdateAsync(updatedWorker);
-        }    
-
-
+        }
 
 
     public async Task DeleteAsync(int workerId)
@@ -72,7 +70,6 @@ public class WorkerLogic : IWorkerLogic
 
     private async Task ValidateWorker(Worker worker)
     {
-
         SearchWorkerParametersDto dto = new("");
         IEnumerable<Worker> workers = await _workerDao.GetAsync(dto);
 

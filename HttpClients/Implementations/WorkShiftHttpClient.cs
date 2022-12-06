@@ -68,7 +68,7 @@ public class WorkShiftHttpClient : IWorkShiftService
         string dtoAsJson = JsonSerializer.Serialize(dto);
         StringContent body = new StringContent(dtoAsJson, Encoding.UTF8, "application/json");
 
-        HttpResponseMessage response = await client.PatchAsync("/WorkShift", body);
+        HttpResponseMessage response = await client.PatchAsync("/WorkShift",body);
         if (!response.IsSuccessStatusCode)
         {
             string content = await response.Content.ReadAsStringAsync();
@@ -84,5 +84,18 @@ public class WorkShiftHttpClient : IWorkShiftService
                 string content = await response.Content.ReadAsStringAsync();
                 throw new Exception(content);
             }
+    }
+
+    public async Task ValidateAsync(WorkShiftValidateDto dto)
+    {
+        string dtoAsJson = JsonSerializer.Serialize(dto);
+        StringContent body = new StringContent(dtoAsJson, Encoding.UTF8, "application/json");
+        
+        HttpResponseMessage response = await client.PostAsync("/WorkShift/Validate",body);
+        if (!response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }
     }
 }

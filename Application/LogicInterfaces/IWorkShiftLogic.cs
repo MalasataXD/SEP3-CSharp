@@ -12,4 +12,5 @@ public interface IWorkShiftLogic
     Task<WorkShift?> GetByIdAsync(int shiftId); // ¤ Get
     Task UpdateAsync(WorkShiftUpdateDto toUpdate); // ¤ Update (Patch)
     Task DeleteAsync(int shiftId); // ¤ Delete
+    void ValidateAsync(WorkShiftValidateDto toValidate); // ¤ Validate
 }
