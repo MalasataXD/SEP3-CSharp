@@ -28,3 +28,8 @@ td {
     text-align: left;
     background-color: lightgray;
 }
+
+.icon {
+    width: 30px;
+    cursor: pointer;
+}

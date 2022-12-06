@@ -34,22 +34,22 @@
     @if (selectedUserId == -1)
     {
         <div>
-            <button disabled @onclick="ShowCreatePopUp">Create</button>
+            <img class="icon" style="visibility: hidden" src="icons/shift-add.png" @onclick="ShowCreatePopUp"/>
         </div>
     }
     else
     {
         <div>
-            <button @onclick="ShowCreatePopUp">Create</button>
+            <img class="icon" src="icons/shift-add.png" @onclick="ShowCreatePopUp"/>
         </div>
     }
 
     <div >
         <div class="btn-group">
             <h5>Year: @year</h5>
-            <button style="float: left" @onclick="@(e => UpdateDate(-1, 0))">-</button>
-            <h5 style="float: left">Uge: @weekNumber</h5>
-            <button @onclick="@(e => UpdateDate(1, 0))">+</button>
+            <img class="icon" src="icons/arrow-alt-left.png" style="float: left" @onclick="@(e => UpdateDate(-1, 0))"/>
+            <h5 style="float: left">Week: @weekNumber</h5>
+            <img class="icon" src="icons/arrow-alt-right.png" @onclick="@(e => UpdateDate(1, 0))"/>
         </div>
     </div>
 
