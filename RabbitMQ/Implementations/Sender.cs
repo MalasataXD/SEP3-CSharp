@@ -81,6 +81,33 @@ public class Sender : ISender
         FormatAndSend("GetShiftBySearchParameters", dto);
     }
 
+    public void DeleteAsync(List<int> shiftIds)
+    {
+        FormatAndSend("RemoveShifts", shiftIds);
+    }
+
+    public void CreateAsync(List<WorkShift> shifts)
+    {
+        List<ShiftJavaDto> toSend = new List<ShiftJavaDto>();
+
+        foreach (var item in shifts)
+        {
+            toSend.Add(new ShiftJavaDto(item));
+        }
+        FormatAndSend("CreateShifts", toSend);
+    }
+
+    public void UpdateAsync(List<WorkShift> toUpdate)
+    {
+        List<ShiftJavaDto> toSend = new List<ShiftJavaDto>();
+
+        foreach (var item in toUpdate)
+        {
+            toSend.Add(new ShiftJavaDto(item));
+        }
+        FormatAndSend("EditShifts", toSend);
+    }
+
     private void FormatAndSend(string Queue, object payload)
     {
         send(Queue, new MessageHeader(QueueName, Queue, payload));

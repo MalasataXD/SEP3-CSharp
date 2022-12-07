@@ -175,4 +175,58 @@ public class WorkShiftDao : IWorkShiftDao
             throw new Exception("Could not delete user");
         }
     }
+
+    public async Task<bool> DeleteAsync(List<int> shiftIds)
+    {
+        try
+        {
+            sender.DeleteAsync(shiftIds);
+            
+            object obj = await receiver.Receive("RemoveShifts");
+            bool? receivedObj = JsonSerializer.Deserialize<bool>((JsonElement)obj);
+            
+            return (bool)receivedObj;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not delete users");
+        }
+    }
+
+    public async Task<bool> CreateAsync(List<WorkShift> shifts)
+    {
+        try
+        {
+            sender.CreateAsync(shifts);
+            
+            object obj = await receiver.Receive("CreateShifts");
+            bool? receivedObj = JsonSerializer.Deserialize<bool>((JsonElement)obj);
+            
+            return (bool)receivedObj;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not create users");
+        }
+    }
+
+    public async Task<bool> UpdateAsync(List<WorkShift> toUpdate)
+    {
+        try
+        {
+            sender.CreateAsync(toUpdate);
+            
+            object obj = await receiver.Receive("EditShifts");
+            bool? receivedObj = JsonSerializer.Deserialize<bool>((JsonElement)obj);
+            
+            return (bool)receivedObj;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Could not update users");
+        }
+    }
 }

@@ -99,4 +99,19 @@ public class WorkShiftFileDao : IWorkShiftDao
 
         return Task.CompletedTask;
     }
+
+    public Task<bool> DeleteAsync(List<int> shiftIds)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> CreateAsync(List<WorkShift> shifts)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> UpdateAsync(List<WorkShift> toUpdate)
+    {
+        throw new NotImplementedException();
+    }
 }
