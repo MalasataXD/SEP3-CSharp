@@ -84,7 +84,7 @@
                         if (workShift.Worker.WorkerId == selectedUserId && string.Equals(date, workShift.Date))
                         {
                             <td>
-                                <button class="card" @onclick="@(e => { ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount); editedWorkShift = workShift;})">
+                                <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
                                     <WorkShiftComponent fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
                                 </button>
                             </td>
@@ -145,7 +145,7 @@
                                            if (workShift.Worker.WorkerId == worker.WorkerId && string.Equals(date, workShift.Date))
                                            {
                                                <td>
-                                                   <button class="card" @onclick="@(e => { ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount); editedWorkShift = workShift;})">
+                                                   <button class="card" @onclick="@(e => ShowWorkShiftPopUp(workShift.ShiftId.ToString(), workShift.Worker.WorkerId.ToString(), workShift.Date, workShift.FromTime, workShift.ToTime, workShift.BreakAmount))">
                                                        <WorkShiftComponent fromTime="@workShift.FromTime" toTime="@workShift.ToTime" BreakAmount="@workShift.BreakAmount"></WorkShiftComponent>
                                                    </button>
                                                </td>
@@ -259,7 +259,10 @@
     private IEnumerable<Worker>? workers;
     private IEnumerable<WorkShift>? _workShifts;
 
-    
+    private List<WorkShift> WorkShiftsToCreate = new List<WorkShift>();
+    private List<WorkShift> WorkShiftsToUpdate = new List<WorkShift>();
+    private List<int> WorkShiftsToDelete = new List<int>();
+
     private string msg = "";
     private string popUpMsg = "";
     private bool showCreatePopUp;
@@ -277,14 +280,13 @@
     private string workerId;
 
     //The WorkShift that is currently being edited
-    private WorkShift? editedWorkShift;
 
     
     private DateTime dateTime = DateTime.Today;
     private int weekNumber;
     private int year;
     
-
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -342,6 +344,17 @@
 
             Worker worker = workers.ToList().Find(worker => worker.WorkerId == selectedUserId);
             WorkShift workShift = new WorkShift(date, fromTime, toTime, worker, breakAmount,"1");
+
+            int id = -1;
+            if (WorkShiftsToCreate.Any())
+            {
+                id = WorkShiftsToCreate.Min(shift => shift.ShiftId);
+                id--;
+            }
+            workShift.ShiftId = id;
+
+            Console.WriteLine(workShift.ShiftId);
+            WorkShiftsToCreate.Add(workShift);
             
             List<WorkShift> workShifts = _workShifts.ToList();
 
@@ -356,6 +369,7 @@
             Console.WriteLine(e);
             popUpMsg = e.Message;
         }
+        
     }
 
 
@@ -390,20 +404,40 @@
             // await WorkShiftService.UpdateAsync(dto);
             
             Worker worker = workers.ToList().Find(worker => worker.WorkerId == Int32.Parse(workerId));
-            WorkShift shift = new WorkShift(date, fromTime, toTime, worker, breakAmount,"1");
-            shift.ShiftId = Int32.Parse(shiftId);
-            
+            WorkShift workShift = new WorkShift(date, fromTime, toTime, worker, breakAmount,"1");
+            workShift.ShiftId = Int32.Parse(shiftId);
+
+            if (WorkShiftsToUpdate.Any())
+            {
+                int index1 = WorkShiftsToUpdate.FindIndex(shift => shift.ShiftId == workShift.ShiftId);
+                if (WorkShiftsToUpdate.Contains(WorkShiftsToUpdate[index1]))
+                {
+                    WorkShiftsToUpdate[index1] = workShift;
+                }
+            }
+            else
+            {
+                if (Int32.Parse(shiftId) < 0)
+                {
+                    int index2 = WorkShiftsToCreate.FindIndex(shift => shift.ShiftId == workShift.ShiftId);
+                    WorkShiftsToCreate[index2] = workShift;
+                }
+                else
+                {
+                    WorkShiftsToUpdate.Add(workShift);
+                }
+            }
             
             List<WorkShift> workShifts = _workShifts.ToList();
 
-            int index = workShifts.FindIndex(shift => shift.Worker.WorkerId == editedWorkShift.Worker.WorkerId && string.Equals(shift.Date, editedWorkShift.Date));
+            int index3 = workShifts.FindIndex(shift => shift.ShiftId == workShift.ShiftId);
 
-            workShifts.RemoveAt(index);
+            workShifts.RemoveAt(index3);
             
             WorkShiftValidateDto dto = new WorkShiftValidateDto(date, fromTime, toTime, Int32.Parse(workerId), breakAmount, workShifts);
             await WorkShiftService.ValidateAsync(dto);
 
-            workShifts.Add(shift);
+            workShifts.Add(workShift);
             
             _workShifts = workShifts.AsEnumerable();
 
@@ -413,17 +447,37 @@
         {
             Console.WriteLine(e);
             popUpMsg = e.Message;
-        }    
+        }  
+        
     }
 
     private async Task DeleteWorkShift()
     {
         List<WorkShift> workShifts = _workShifts.ToList();
-        
-        int index = workShifts.FindIndex(shift => shift.Worker.WorkerId == editedWorkShift.Worker.WorkerId && string.Equals(shift.Date, editedWorkShift.Date));
+
+
+        if (Int32.Parse(shiftId) > 0)
+        {
+            int index1 = WorkShiftsToUpdate.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
+            
+            if (index1 != -1)
+            {
+                WorkShiftsToUpdate.RemoveAt(index1);
+            }
+            
+            WorkShiftsToDelete.Add(Int32.Parse(shiftId));
+        }
+        else
+        {
+            int index1 = WorkShiftsToCreate.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
+            WorkShiftsToCreate.RemoveAt(index1);
+        }
+
+
+        int index2 = workShifts.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
         CloseDeleteConfirmationPopUp();
 
-        if (workShifts.Remove(workShifts[index]))
+        if (workShifts.Remove(workShifts[index2]))
         {
             CloseWorkShiftPopUp();
             _workShifts = workShifts.ToList();
@@ -432,6 +486,7 @@
         {
             popUpMsg = "The workshift you are trying to delete does not exist!";
         }
+        
     }
     
     
