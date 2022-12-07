@@ -11,5 +11,9 @@ public interface IWorkShiftService
     Task DeleteAsync(int id);
     Task ValidateAsync(WorkShiftValidateDto dto);
 
+    Task CreateAsync(IEnumerable<WorkShiftCreationDto> dtos);
+    Task UpdateAsync(IEnumerable<WorkShiftUpdateDto> dtos);
+    Task DeleteAsync(List<int> ids);
+
 
 }

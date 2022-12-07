@@ -90,7 +90,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         await _WorkShiftDao.DeleteAsync(shiftId);
     }
 
-    public void ValidateAsync(WorkShiftValidateDto toValidate)
+    public async Task ValidateAsync(WorkShiftValidateDto toValidate)
     {
         //todo check for absence
         //todo add unitTesting!
@@ -99,7 +99,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         ValidateTime(toValidate.ToTime);
         ValidateTimes(toValidate.FromTime, toValidate.ToTime);
 
-        IsWorkerOccupied(toValidate.WorkerId, toValidate.Date, toValidate.WorkShifts);
+        await IsWorkerOccupied(toValidate.WorkerId, toValidate.Date, toValidate.WorkShifts);
     }
 
     public Task DeleteAsync(List<int> shiftIds)
@@ -209,8 +209,15 @@ public class WorkShiftLogic : IWorkShiftLogic
         }
     }
 
-    private void IsWorkerOccupied(int id, string date ,IEnumerable<WorkShift>  workShifts)
+    private async Task IsWorkerOccupied(int id, string date ,IEnumerable<WorkShift>  workShifts)
     {
+
+        Worker? worker = await _WorkerDao.GetByIdAsync(id);
+        if (worker == null)
+        {
+            throw new Exception($"Worker with {id} does not exist!");
+        }
+        
         foreach (var workShift in workShifts)
         {
             if (id == workShift.Worker.WorkerId && string.Equals(date,workShift.Date))
