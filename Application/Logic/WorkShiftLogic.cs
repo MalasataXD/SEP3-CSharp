@@ -19,7 +19,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         _WorkShiftDao = workShiftDao;
         _WorkerDao = workerDao;
     }
-
+    
     public async Task<WorkShift> CreateAsync(WorkShiftCreationDto toCreate)
     {
 
@@ -101,7 +101,59 @@ public class WorkShiftLogic : IWorkShiftLogic
 
         IsWorkerOccupied(toValidate.WorkerId, toValidate.Date, toValidate.WorkShifts);
     }
-    
+
+    public Task DeleteAsync(List<int> shiftIds)
+    {
+        return Task.FromResult(_WorkShiftDao.DeleteAsync(shiftIds));
+    }
+
+    public Task CreateAsync(List<WorkShiftCreationDto> toCreate)
+    {
+        List<WorkShift> shifts = new List<WorkShift>();
+        
+        foreach (var item in toCreate)
+        {
+            Worker worker = new Worker();
+            worker.WorkerId = (int)item.WorkerId;
+            
+            shifts.Add(new WorkShift
+            {
+                BreakAmount = item.BreakAmount,
+                Date = item.Date,
+                FromTime = item.FromTime,
+                ToTime = item.ToTime,
+                Worker = worker,
+                BossId = item.BossId
+            });
+        }
+
+        return Task.FromResult(_WorkShiftDao.CreateAsync(shifts));
+    }
+
+    public Task UpdateAsync(List<WorkShiftUpdateDto> toUpdate)
+    {
+        
+        List<WorkShift> shifts = new List<WorkShift>();
+        foreach (var item in toUpdate)
+        {
+            Worker worker = new Worker();
+            worker.WorkerId = (int)item.WorkerId;
+            shifts.Add(new WorkShift
+            {
+                BreakAmount = item.BreakAmount,
+                Date = item.Date,
+                FromTime = item.FromTime,
+                ToTime = item.ToTime,
+                ShiftId = item.ShiftId,
+                Worker = worker
+            });
+        }
+        
+        
+        
+        return Task.FromResult(_WorkShiftDao.UpdateAsync(shifts));
+    }
+
     private void ValidateDate(string date)
     {
         try

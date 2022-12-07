@@ -22,9 +22,6 @@ public class Test
         WorkerJavaDto? workerJavaDto = JsonSerializer.Deserialize<WorkerJavaDto>((JsonElement)o);
 
         Console.WriteLine(workerJavaDto.workerId);
-
-
-
-
+        
 }
 }

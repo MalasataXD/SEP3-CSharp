@@ -1,5 +1,6 @@
 ﻿using System.Security.AccessControl;
 using System.Text.Json;
+using System.Threading.Channels;
 using Application.DAOInterfaces;
 using Domain.DTOs.JavaDTOs;
 using Domain.DTOs.SearchParameters;
@@ -176,16 +177,12 @@ public class WorkShiftDao : IWorkShiftDao
         }
     }
 
-    public async Task<bool> DeleteAsync(List<int> shiftIds)
+    public Task DeleteAsync(List<int> shiftIds)
     {
         try
         {
             sender.DeleteAsync(shiftIds);
-            
-            object obj = await receiver.Receive("RemoveShifts");
-            bool? receivedObj = JsonSerializer.Deserialize<bool>((JsonElement)obj);
-            
-            return (bool)receivedObj;
+            return Task.CompletedTask;
         }
         catch (Exception e)
         {
@@ -194,16 +191,12 @@ public class WorkShiftDao : IWorkShiftDao
         }
     }
 
-    public async Task<bool> CreateAsync(List<WorkShift> shifts)
+    public Task CreateAsync(List<WorkShift> shifts)
     {
         try
         {
             sender.CreateAsync(shifts);
-            
-            object obj = await receiver.Receive("CreateShifts");
-            bool? receivedObj = JsonSerializer.Deserialize<bool>((JsonElement)obj);
-            
-            return (bool)receivedObj;
+            return Task.CompletedTask;
         }
         catch (Exception e)
         {
@@ -212,16 +205,12 @@ public class WorkShiftDao : IWorkShiftDao
         }
     }
 
-    public async Task<bool> UpdateAsync(List<WorkShift> toUpdate)
+    public Task UpdateAsync(List<WorkShift> toUpdate)
     {
         try
         {
-            sender.CreateAsync(toUpdate);
-            
-            object obj = await receiver.Receive("EditShifts");
-            bool? receivedObj = JsonSerializer.Deserialize<bool>((JsonElement)obj);
-            
-            return (bool)receivedObj;
+            sender.UpdateAsync(toUpdate);
+            return Task.CompletedTask;
         }
         catch (Exception e)
         {

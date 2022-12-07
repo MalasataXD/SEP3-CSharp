@@ -2,7 +2,7 @@
 
 public class WorkShiftValidateDto
 {
-    // # Fields
+    // # Fields 
     public string Date {get;}
     public string FromTime {get;} 
     public string ToTime { get;}
@@ -20,4 +20,5 @@ public class WorkShiftValidateDto
         BreakAmount = breakAmount;
         WorkShifts = workShifts;
     }
+    
 }

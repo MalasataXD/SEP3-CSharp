@@ -12,7 +12,7 @@ public interface IWorkShiftDao
     Task<WorkShift> UpdateAsync(WorkShift toUpdate); // ¤ Update (Patch)
     Task DeleteAsync(int shiftId); // ¤ Delete
     
-    Task<bool> DeleteAsync(List<int> shiftIds); // ¤ Delete
-    Task<bool> CreateAsync(List<WorkShift> shifts); // ¤ Delete
-    Task<bool> UpdateAsync(List<WorkShift> toUpdate); // ¤ Update (Patch)
+    Task DeleteAsync(List<int> shiftIds); // ¤ Delete
+    Task CreateAsync(List<WorkShift> shifts); // ¤ Delete
+    Task UpdateAsync(List<WorkShift> toUpdate); // ¤ Update (Patch)
 }

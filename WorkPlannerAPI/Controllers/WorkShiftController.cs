@@ -36,6 +36,25 @@ public class WorkShiftController : ControllerBase
         }
     }
     
+    // ¤ Create WorkShift
+    [HttpPost("/WorkShifts")]
+    public async Task<ActionResult<WorkShift>> CreateAsync(List<WorkShiftCreationDto> toCreate)
+    {
+        try
+        {
+            await _workShiftLogic.CreateAsync(toCreate);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    
+    
+    
     // ¤ Get WorkShift
     [HttpGet]
     public async Task<ActionResult<IEnumerable<WorkShift>>> GetAsync(string? date, string? workerName)
@@ -69,6 +88,22 @@ public class WorkShiftController : ControllerBase
         }
     }
     
+    [HttpPatch("/WorkShifts")]
+    public async Task<ActionResult> UpdateAsync([FromBody] List<WorkShiftUpdateDto> toUpdate)
+    {
+        try
+        {
+            await _workShiftLogic.UpdateAsync(toUpdate);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    
     // ¤ Delete WorkShift
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<bool>> DeleteAsync([FromRoute] int id)
@@ -84,6 +119,24 @@ public class WorkShiftController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+    
+    [HttpDelete("/WorkShifts")]
+    public async Task<ActionResult<bool>> DeleteAsync([FromBody] List<int> ids)
+    {
+        try
+        {
+            await _workShiftLogic.DeleteAsync(ids);
+            return new OkResult();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+    
+    
+    
     
     // ¤ Validate WorkShift
     [HttpPost("Validate")]
