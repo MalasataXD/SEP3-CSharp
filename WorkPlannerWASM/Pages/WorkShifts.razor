@@ -287,7 +287,7 @@
 
 @code {
 
-    private bool online = true;
+    private bool online = false;
     
     private int selectedUserId = -1;
 
@@ -350,6 +350,22 @@
         {
             Console.WriteLine(e);
         }
+    }
+    
+    private async Task UpdateDate(int weekNumberChange, int yearChange)
+    {
+
+        dateTime = dateTime.AddDays(weekNumberChange * 7);
+        dateTime = dateTime.AddYears(yearChange);
+        
+        while (dateTime.DayOfWeek != DayOfWeek.Monday)
+        {
+            dateTime = dateTime.AddDays(-1);
+        }
+        
+        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        year = dateTime.Year;
+        
     }
     
     private async Task UpdateSchema()
@@ -415,23 +431,7 @@
 
     }
 
-
     
-    private async Task UpdateDate(int weekNumberChange, int yearChange)
-    {
-
-        dateTime = dateTime.AddDays(weekNumberChange * 7);
-        dateTime = dateTime.AddYears(yearChange);
-        
-    while (dateTime.DayOfWeek != DayOfWeek.Monday)
-    {
-        dateTime = dateTime.AddDays(-1);
-    }
-        
-        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-        year = dateTime.Year;
-        
-    }
     
     private async Task UpdateWorkShift()
     {
@@ -608,6 +608,7 @@
         }
         isWaiting = false;
         CloseCreateWorkShiftsConfirmationPopUp();
+        
     }
     
     
