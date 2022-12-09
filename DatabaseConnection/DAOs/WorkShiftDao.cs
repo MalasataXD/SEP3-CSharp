@@ -39,7 +39,7 @@ public class WorkShiftDao : IWorkShiftDao
             
             
             // # Return the shift.
-            return new WorkShift(dto.shiftId,dto.date, dto.fromHour + ":" + dto.fromMinute, dto.toHour + ":" + dto.toMinute, worker, dto.breakAmount.ToString(), dto.bossId.ToString());
+            return new WorkShift(dto.shiftId,dto.date, FormatTime(dto.fromHour,dto.fromMinute), FormatTime(dto.toHour,dto.toMinute), worker, dto.breakAmount.ToString(), dto.bossId.ToString());
         }
         catch (Exception e)
         {
@@ -74,8 +74,8 @@ public class WorkShiftDao : IWorkShiftDao
 
                 WorkShift workShift = new WorkShift(
                     item.date,
-                    $"{item.fromHour}:{item.fromMinute}",
-                    $"{item.toHour}:{item.toMinute}",
+                    FormatTime(item.fromHour,item.fromMinute),
+                    FormatTime(item.toHour,item.toMinute),
                     worker,
                     item.breakAmount.ToString(),
                     item.bossId.ToString()
@@ -107,8 +107,8 @@ public class WorkShiftDao : IWorkShiftDao
 
             WorkShift workShift = new WorkShift(
                 dto.date,
-                $"{dto.fromHour}:{dto.fromMinute}",
-                $"{dto.toHour}:{dto.toMinute}",
+                FormatTime(dto.fromHour,dto.fromMinute),
+                FormatTime(dto.toHour,dto.toMinute),
                 worker,
                 dto.breakAmount.ToString(),
                 dto.bossId.ToString()
@@ -142,9 +142,8 @@ public class WorkShiftDao : IWorkShiftDao
 
             
             WorkShift workShift = new WorkShift(
-                receivedObj.date,
-                $"{receivedObj.fromHour}:{receivedObj.fromMinute}",
-                $"{receivedObj.toHour}:{receivedObj.toMinute}",
+                receivedObj.date,FormatTime(receivedObj.fromHour,receivedObj.fromMinute),
+                FormatTime(receivedObj.toHour,receivedObj.toMinute),
                 worker,
                 receivedObj.breakAmount.ToString(),
                 receivedObj.bossId.ToString()
@@ -218,4 +217,15 @@ public class WorkShiftDao : IWorkShiftDao
             throw new Exception("Could not update users");
         }
     }
+
+    private string FormatTime(int hour, int minute)
+    {
+        string formattedHour = hour < 10 ? "0" + hour : "" + hour;
+        string formattedMinute = minute < 10 ? "0" + minute : "" + minute;
+
+        Console.WriteLine(formattedHour + ":" + formattedMinute);
+        
+        return formattedHour + ":" + formattedMinute;
+    }
+
 }
