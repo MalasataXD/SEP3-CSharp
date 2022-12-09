@@ -178,7 +178,7 @@ public class WorkShiftLogic : IWorkShiftLogic
         {
             string[] timeSplit = time.Split(":", 2);
         
-            if (timeSplit[0].Length != 2 && timeSplit[1].Length != 2)
+            if (timeSplit[0].Length != 2 || timeSplit[1].Length != 2)
             {
                 throw new Exception("Invalid time format");
             }

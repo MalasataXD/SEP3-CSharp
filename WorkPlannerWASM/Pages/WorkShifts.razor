@@ -593,9 +593,9 @@
             await WorkShiftService.UpdateAsync(updatedDtos.AsEnumerable());
             await WorkShiftService.DeleteAsync(WorkShiftsToDelete);
 
-            WorkShiftsToCreate = new();
-            WorkShiftsToUpdate = new();
-            WorkShiftsToDelete = new();
+            WorkShiftsToCreate.Clear();
+            WorkShiftsToUpdate.Clear();
+            WorkShiftsToDelete.Clear();
 
             Thread.Sleep(1000);
             await UpdateSchema();
