@@ -6,6 +6,13 @@ public class MQConfig
     private static MQConfig instance = null;
     private static readonly object padlock = new object();
     
+    private MQConfig()
+    {
+        QueueName = "localClient1";
+        HostName = "localhost";
+        DispatcherName = "Dispatcher";
+    }
+
     //get obj
     public static MQConfig GetInstance
     {
@@ -30,10 +37,4 @@ public class MQConfig
     
     public string QueueName { get; }
     
-    private MQConfig()
-    {
-        QueueName = "localClient1";
-        HostName = "localhost";
-        DispatcherName = "Dispatcher";
-    }
 }
