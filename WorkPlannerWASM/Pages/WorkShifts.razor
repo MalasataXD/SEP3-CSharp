@@ -287,7 +287,7 @@
 
 @code {
 
-    private bool online = false;
+    private bool online = true;
     
     private int selectedUserId = -1;
 
@@ -416,6 +416,7 @@
             {
             WorkShiftCreationDto CreateDto = new(date, fromTime, toTime, selectedUserId ,breakAmount, "1");
             await WorkShiftService.CreateAsync(CreateDto);
+            await UpdateSchema();
             }
             
             
@@ -492,6 +493,7 @@
 
             if (online)
             {
+                Console.WriteLine(shiftId);
                 WorkShiftUpdateDto updateDto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
                 await WorkShiftService.UpdateAsync(updateDto);
             }
