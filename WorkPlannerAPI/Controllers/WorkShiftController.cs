@@ -38,7 +38,7 @@ public class WorkShiftController : ControllerBase
     
     // ¤ Create WorkShift
     [HttpPost("/WorkShifts")]
-    public async Task<ActionResult<WorkShift>> CreateAsync(List<WorkShiftCreationDto> toCreate)
+    public async Task<ActionResult> CreateAsync(List<WorkShiftCreationDto> toCreate)
     {
         try
         {
@@ -120,8 +120,8 @@ public class WorkShiftController : ControllerBase
         }
     }
     
-    [HttpDelete("/WorkShifts")]
-    public async Task<ActionResult<bool>> DeleteAsync([FromBody] List<int> ids)
+    [HttpPost("/WorkShifts/Delete")]
+    public async Task<ActionResult<bool>> PostAsync([FromBody] List<int> ids)
     {
         try
         {
@@ -144,7 +144,7 @@ public class WorkShiftController : ControllerBase
     {
         try
         {
-            _workShiftLogic.ValidateAsync(dto);
+            await _workShiftLogic.ValidateAsync(dto);
             return new OkResult();
         }
         catch (Exception e)

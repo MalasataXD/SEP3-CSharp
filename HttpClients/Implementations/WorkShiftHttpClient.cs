@@ -98,4 +98,37 @@ public class WorkShiftHttpClient : IWorkShiftService
             throw new Exception(content);
         }
     }
+
+    public async Task CreateAsync(IEnumerable<WorkShiftCreationDto> dtos)
+    {
+        HttpResponseMessage response = await client.PostAsJsonAsync("/WorkShifts", dtos);
+        string result = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception(result);
+        }
+    }
+
+    public async Task UpdateAsync(IEnumerable<WorkShiftUpdateDto> dtos)
+    {
+        string dtoAsJson = JsonSerializer.Serialize(dtos);
+        StringContent body = new StringContent(dtoAsJson, Encoding.UTF8, "application/json");
+        
+        HttpResponseMessage response = await client.PatchAsync("/WorkShifts", body);
+        if (!response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }
+    }
+
+    public async Task DeleteAsync(List<int> ids)
+    {
+        HttpResponseMessage response = await client.PostAsJsonAsync($"/WorkShifts/Delete",ids);
+        if (!response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }    
+    }
 }

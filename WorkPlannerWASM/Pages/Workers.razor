@@ -59,7 +59,7 @@ else
                 }
                 else
                 {
-                    <td><img class="icon" src="icons/edit.png" @onclick="@(() => ShowCreatePopUp(worker.WorkerId, worker.FirstName, worker.LastName, worker.Mail, worker.PhoneNumber, worker.Address))"/></td>
+                    <td><img class="icon" src="icons/edit.png" @onclick="@(() => { ShowCreatePopUp(worker.WorkerId, worker.FirstName, worker.LastName, worker.Mail, worker.PhoneNumber, worker.Address); edit = true;})"/></td>
                     <td><img class="icon" src="icons/delete.png" @onclick="@(() => {Id = worker.WorkerId; ShowDeleteConfirmationPopUp(); })"/>  </td>
                 }
             </tr>
@@ -75,11 +75,9 @@ else
 
 
 <PopUp ShowPopUp="showCreatePopUp">
-
-
+    
     <button @onclick="@CloseCreatePopUp">Exit</button>
 
-    
     <div class="form-group field">
         <label>First name:</label>
         <input type="text" @bind="FirstName"/>
@@ -104,7 +102,15 @@ else
         <input type="text" @bind="Address"/>
     </div>
     
-    <button @onclick="@CreateOrUpdateWorker" disabled="@isButtonDisabled">Done</button>
+    @if (edit)
+    {
+        <button @onclick="@UpdateWorker" disabled="@isButtonDisabled">Update</button>
+    }
+    else
+    {
+        <button @onclick="@CreateWorker" disabled="@isButtonDisabled">Create</button>
+    }
+    
     
     @if (!string.IsNullOrEmpty(popUpMsg))
     {
@@ -141,7 +147,7 @@ else
     private string Mail;
     private string Address;
     
-    private bool edit = false;
+    private bool edit;
 
     protected override async Task OnInitializedAsync()
     {
@@ -171,13 +177,11 @@ else
         PhoneNumber = phoneNumber.ToString();
         Address = address;
         showCreatePopUp = true;
-        
-    // if firstname already has a value the popup should be an edit
-        edit = !string.IsNullOrEmpty(firstName);
     }
 
     private void CloseCreatePopUp()
     {
+        edit = false;
         showCreatePopUp = false;
     }
 
@@ -190,7 +194,7 @@ else
         showDeleteConfirmationPopUp = false;
     }
     
-    private async Task CreateOrUpdateWorker()
+    private async Task CreateWorker()
     {
         isButtonDisabled = true;
         
@@ -215,17 +219,51 @@ else
         
         try
         {
-            if (edit)
-            {
-                WorkerUpdateDto dto = new(Id, FirstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
-                await WorkerService.UpdateAsync(dto);
-            }
+            WorkerCreationDto dto = new(FirstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
+            await WorkerService.CreateAsync(dto);
+
+            await LoadWorkers();
             
-            else
-            {
-                WorkerCreationDto dto = new(FirstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
-                await WorkerService.CreateAsync(dto);
-            }
+            isButtonDisabled = false;
+            
+            CloseCreatePopUp();
+        }
+        
+        catch (Exception e)
+        {
+            isButtonDisabled = false;
+            Console.WriteLine(e);
+            popUpMsg = e.Message;
+        }
+    }
+    
+    private async Task UpdateWorker()
+    {
+        isButtonDisabled = true;
+        
+        popUpMsg = "";
+        if (string.IsNullOrEmpty(FirstName) || string.IsNullOrEmpty(LastName) || string.IsNullOrEmpty(PhoneNumber) || string.IsNullOrEmpty(Mail) || string.IsNullOrEmpty(Address))
+        {
+            isButtonDisabled = false;
+            popUpMsg = "Fields may not be empty";
+            return;
+        }
+
+        try
+        {
+            Int32.Parse(PhoneNumber);
+        }
+        catch (Exception e)
+        {
+            isButtonDisabled = false;
+            popUpMsg = "Phonenumber may only contain numbers";
+            return;
+        }
+        
+        try
+        {
+            WorkerUpdateDto dto = new(Id, FirstName, LastName, Int32.Parse(PhoneNumber), Mail, Address);
+            await WorkerService.UpdateAsync(dto);
 
             await LoadWorkers();
             

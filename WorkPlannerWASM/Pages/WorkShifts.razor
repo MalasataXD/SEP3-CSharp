@@ -172,10 +172,26 @@
         </table>
     }
     
+
+    if (online)
+    {
+        <button @onclick="() => online = false" disabled="@isWaiting">LIVE
+        </button>
+    }
+    else
+    {
+        <button @onclick="ShowOnlineConfirmationPopUp" disabled="@isWaiting">OFFLINE
+        </button>
+        <button @onclick="ShowCreateWorkShiftsConfirmationPopUp" disabled="@isWaiting">Save changes
+            
+        </button>
+    }
+    
+    
     
     <PopUp ShowPopUp="showCreatePopUp">
         
-        <button @onclick="@CloseCreatePopUp">Exit</button>
+        <button @onclick="@CloseCreatePopUp" disabled="@isWaiting">Exit</button>
     
         <div class="form-group field">
             <label>Date:</label>
@@ -196,7 +212,7 @@
             <input type="text" @bind="breakAmount"/>
         </div>
     
-        <button @onclick="@CreateWorkShift">Create WorkShift</button>
+        <button @onclick="@CreateWorkShift" disabled="@isWaiting">Create WorkShift</button>
     
         @if (!string.IsNullOrEmpty(popUpMsg))
         {
@@ -206,7 +222,7 @@
     
     <PopUp ShowPopUp="showWorkShiftPopUp">
         
-        <button @onclick="@CloseWorkShiftPopUp">Exit</button>
+        <button @onclick="@CloseWorkShiftPopUp" disabled="@isWaiting">Exit</button>
         
         <div class="form-group field">
             <label>WorkerId:</label>
@@ -231,9 +247,9 @@
                     <input type="text" @bind="breakAmount"/>
                 </div>
         
-        <button @onclick="UpdateWorkShift">Update WorkShift</button>
+        <button @onclick="UpdateWorkShift" disabled="@isWaiting">Update WorkShift</button>
     
-        <button @onclick="ShowDeleteConfirmationPopUp">Delete WorkShift</button>
+        <button @onclick="ShowDeleteConfirmationPopUp" disabled="@isWaiting">Delete WorkShift</button>
 
         
         @if (!string.IsNullOrEmpty(popUpMsg))
@@ -245,30 +261,49 @@
     <PopUp ShowPopUp="showDeleteConfirmationPopUp">
         <h3>Are you sure you want to delete this</h3>
         
-        <button @onclick="DeleteWorkShift">Yes</button>
-        <button @onclick="CloseDeleteConfirmationPopUp">No</button>
+        <button @onclick="DeleteWorkShift" disabled="@isWaiting">Yes</button>
+        <button @onclick="CloseDeleteConfirmationPopUp" disabled="@isWaiting">No</button>
     </PopUp>
+    
+    
+    <PopUp ShowPopUp="showOnlineConfirmationPopUp">
+        <h3>Are you sure you want to go live?</h3>
+        <h5>Doing so will not save your unsaved changes</h5>
+
+        <button @onclick="GoLive" disabled="@isWaiting">Yes</button>
+        <button @onclick="CloseOnlineConfirmationPopUp" disabled="@isWaiting">No</button>
+    </PopUp>
+    
+    <PopUp ShowPopUp="showCreateWorkShiftsConfirmationPopUp">
+                <h3>Are you sure you want to save your changes</h3>
+        
+                <button @onclick="CommitChangesToDatabase" disabled="@isWaiting" >Yes</button>
+                <button @onclick="CloseCreateWorkShiftsConfirmationPopUp" disabled="@isWaiting">No</button>
+    </PopUp>
+    
 }
 
 
 
 @code {
 
+    private bool online = false;
+    
     private int selectedUserId = -1;
 
     private IEnumerable<Worker>? workers;
     private IEnumerable<WorkShift>? _workShifts;
 
-    private List<WorkShift> WorkShiftsToCreate = new List<WorkShift>();
-    private List<WorkShift> WorkShiftsToUpdate = new List<WorkShift>();
-    private List<int> WorkShiftsToDelete = new List<int>();
+    private List<WorkShift> WorkShiftsToCreate = new ();
+    private List<WorkShift> WorkShiftsToUpdate = new ();
+    private List<int> WorkShiftsToDelete = new ();
 
-    private string msg = "";
     private string popUpMsg = "";
     private bool showCreatePopUp;
     private bool showWorkShiftPopUp;
     private bool showDeleteConfirmationPopUp;
-
+    private bool showOnlineConfirmationPopUp;
+    private bool showCreateWorkShiftsConfirmationPopUp;
     private string? nameFilter;
 
     //Create PopUp textfields
@@ -278,14 +313,14 @@
     private string breakAmount;
     private string shiftId;
     private string workerId;
-
-    //The WorkShift that is currently being edited
-
     
     private DateTime dateTime = DateTime.Today;
     private int weekNumber;
     private int year;
     
+    //Disables buttons while commiting changes
+    private bool isWaiting = false;
+
     
 
     protected override async Task OnInitializedAsync()
@@ -314,8 +349,23 @@
         catch (Exception e)
         {
             Console.WriteLine(e);
-            msg = e.Message;
         }
+    }
+    
+    private async Task UpdateDate(int weekNumberChange, int yearChange)
+    {
+
+        dateTime = dateTime.AddDays(weekNumberChange * 7);
+        dateTime = dateTime.AddYears(yearChange);
+        
+        while (dateTime.DayOfWeek != DayOfWeek.Monday)
+        {
+            dateTime = dateTime.AddDays(-1);
+        }
+        
+        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        year = dateTime.Year;
+        
     }
     
     private async Task UpdateSchema()
@@ -325,19 +375,18 @@
 
     private async Task CreateWorkShift()
     {
+        isWaiting = true;
+        
         popUpMsg = "";
         if (string.IsNullOrEmpty(date) || string.IsNullOrEmpty(fromTime) || string.IsNullOrEmpty(toTime) || string.IsNullOrEmpty(breakAmount))
         {
+            isWaiting = false;
             popUpMsg = "Fields may not be empty";
             return;
         }
         
         try
         {
-            // WorkShiftCreationDto dto = new(date, fromTime, toTime, selectedUserId ,breakAmount, "1");
-            //
-            // WorkShift workShift = await WorkShiftService.CreateAsync(dto);
-
             WorkShiftValidateDto dto = new WorkShiftValidateDto(date, fromTime, toTime, selectedUserId, breakAmount, _workShifts);
             
             await WorkShiftService.ValidateAsync(dto);
@@ -361,6 +410,14 @@
             workShifts.Add(workShift);
 
             _workShifts = workShifts.AsEnumerable();
+
+
+            if (online)
+            {
+            WorkShiftCreationDto CreateDto = new(date, fromTime, toTime, selectedUserId ,breakAmount, "1");
+            await WorkShiftService.CreateAsync(CreateDto);
+            }
+            
             
             CloseCreatePopUp();
         } 
@@ -368,56 +425,48 @@
         {
             Console.WriteLine(e);
             popUpMsg = e.Message;
+            isWaiting = false;
         }
-        
-    }
+        isWaiting = false;
 
+    }
 
     
-    private async Task UpdateDate(int weekNumberChange, int yearChange)
-    {
-        dateTime = dateTime.AddDays(weekNumberChange * 7);
-        dateTime = dateTime.AddYears(yearChange);
-        
-    while (dateTime.DayOfWeek != DayOfWeek.Monday)
-    {
-        dateTime = dateTime.AddDays(-1);
-    }
-        
-        weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-        year = dateTime.Year;
-        
-    }
     
     private async Task UpdateWorkShift()
     {
+        isWaiting = true;
+
         popUpMsg = "";
         if (string.IsNullOrEmpty(shiftId) || string.IsNullOrEmpty(workerId) || string.IsNullOrEmpty(date) || string.IsNullOrEmpty(fromTime) || string.IsNullOrEmpty(toTime) || string.IsNullOrEmpty(breakAmount))
         {
+            isWaiting = false;
             popUpMsg = "Fields may not be empty";
             return;
         }
         
         try
         {
-            // WorkShiftUpdateDto dto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
-            // await WorkShiftService.UpdateAsync(dto);
-            
             Worker worker = workers.ToList().Find(worker => worker.WorkerId == Int32.Parse(workerId));
             WorkShift workShift = new WorkShift(date, fromTime, toTime, worker, breakAmount,"1");
             workShift.ShiftId = Int32.Parse(shiftId);
-
+            
             if (WorkShiftsToUpdate.Any())
             {
                 int index1 = WorkShiftsToUpdate.FindIndex(shift => shift.ShiftId == workShift.ShiftId);
-                if (WorkShiftsToUpdate.Contains(WorkShiftsToUpdate[index1]))
+
+                if (index1 != -1)
                 {
                     WorkShiftsToUpdate[index1] = workShift;
+                }
+                else
+                {
+                    WorkShiftsToUpdate.Add(workShift);
                 }
             }
             else
             {
-                if (Int32.Parse(shiftId) < 0)
+                if (workShift.ShiftId < 0)
                 {
                     int index2 = WorkShiftsToCreate.FindIndex(shift => shift.ShiftId == workShift.ShiftId);
                     WorkShiftsToCreate[index2] = workShift;
@@ -441,51 +490,124 @@
             
             _workShifts = workShifts.AsEnumerable();
 
+            if (online)
+            {
+                WorkShiftUpdateDto updateDto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
+                await WorkShiftService.UpdateAsync(updateDto);
+            }
+            
             CloseWorkShiftPopUp();
         }
         catch (Exception e)
         {
+            isWaiting = false;
             Console.WriteLine(e);
             popUpMsg = e.Message;
         }  
-        
+        isWaiting = false;
+
     }
 
     private async Task DeleteWorkShift()
     {
-        List<WorkShift> workShifts = _workShifts.ToList();
+        isWaiting = true;
 
-
-        if (Int32.Parse(shiftId) > 0)
+        try
         {
-            int index1 = WorkShiftsToUpdate.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
-            
-            if (index1 != -1)
+            List<WorkShift> workShifts = _workShifts.ToList();
+
+            if (Int32.Parse(shiftId) > 0)
             {
-                WorkShiftsToUpdate.RemoveAt(index1);
-            }
+                int index1 = WorkShiftsToUpdate.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
             
-            WorkShiftsToDelete.Add(Int32.Parse(shiftId));
-        }
-        else
-        {
-            int index1 = WorkShiftsToCreate.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
-            WorkShiftsToCreate.RemoveAt(index1);
-        }
+                if (index1 != -1)
+                {
+                    WorkShiftsToUpdate.RemoveAt(index1);
+                }
+            
+                WorkShiftsToDelete.Add(Int32.Parse(shiftId));
+            }
+            else
+            {
+                int index1 = WorkShiftsToCreate.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
+                WorkShiftsToCreate.RemoveAt(index1);
+            }
 
 
-        int index2 = workShifts.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
-        CloseDeleteConfirmationPopUp();
+            int index2 = workShifts.FindIndex(shift => shift.ShiftId == Int32.Parse(shiftId));
+            CloseDeleteConfirmationPopUp();
 
-        if (workShifts.Remove(workShifts[index2]))
-        {
-            CloseWorkShiftPopUp();
-            _workShifts = workShifts.ToList();
+            if (workShifts.Remove(workShifts[index2]))
+            {
+                CloseWorkShiftPopUp();
+                _workShifts = workShifts.ToList();
+            }
+            else
+            {
+                popUpMsg = "The workshift you are trying to delete does not exist!";
+            }
+
+            if (online)
+            {
+                await WorkShiftService.DeleteAsync(Int32.Parse(shiftId));
+            }
+
         }
-        else
+        catch (Exception e)
         {
-            popUpMsg = "The workshift you are trying to delete does not exist!";
+            isWaiting = false;
+            Console.WriteLine(e);
+            throw;
         }
+      
+        isWaiting = false;
+
+    }
+
+    private async Task CommitChangesToDatabase()
+    {
+        isWaiting = true;
+
+        try
+        {
+            List<WorkShiftCreationDto> createDtos = new ();
+            List<WorkShiftUpdateDto> updatedDtos = new ();
+
+
+            foreach (var shift in WorkShiftsToCreate)
+            {
+                WorkShiftCreationDto dto = new(shift.Date, shift.FromTime, shift.ToTime, shift.Worker.WorkerId, shift.BreakAmount, "1");
+                createDtos.Add(dto);
+            }
+            foreach (var shift in WorkShiftsToUpdate)
+            {
+                WorkShiftUpdateDto dto = new(shift.ShiftId, shift.Worker.WorkerId, shift.Date, shift.FromTime, shift.ToTime, shift.BreakAmount);
+                updatedDtos.Add(dto);
+            }
+
+            Console.WriteLine(createDtos.AsEnumerable().Count());
+            Console.WriteLine(updatedDtos.AsEnumerable().Count());
+            Console.WriteLine(WorkShiftsToDelete.Count);
+        
+            await WorkShiftService.CreateAsync(createDtos.AsEnumerable());
+            await WorkShiftService.UpdateAsync(updatedDtos.AsEnumerable());
+            await WorkShiftService.DeleteAsync(WorkShiftsToDelete);
+
+            WorkShiftsToCreate.Clear();
+            WorkShiftsToUpdate.Clear();
+            WorkShiftsToDelete.Clear();
+
+            Thread.Sleep(1000);
+            await UpdateSchema();
+
+        }
+        catch
+        {
+            isWaiting = false;
+
+        }
+        isWaiting = false;
+        CloseCreateWorkShiftsConfirmationPopUp();
         
     }
     
@@ -527,6 +649,36 @@
     private void CloseDeleteConfirmationPopUp()
     {
         showDeleteConfirmationPopUp = false;
+    }
+
+    private void ShowOnlineConfirmationPopUp()
+    {
+        showOnlineConfirmationPopUp = true;
+    }
+    
+    private void CloseOnlineConfirmationPopUp()
+    {
+        showOnlineConfirmationPopUp = false;
+    }
+    
+    private void ShowCreateWorkShiftsConfirmationPopUp()
+    {
+        showCreateWorkShiftsConfirmationPopUp = true;
+    }
+    
+    private void CloseCreateWorkShiftsConfirmationPopUp()
+    {
+        showCreateWorkShiftsConfirmationPopUp = false;
+    }
+    
+
+    private async Task GoLive()
+    {
+        isWaiting = true;
+        online = true;
+        await UpdateSchema();
+        CloseOnlineConfirmationPopUp();
+        isWaiting = false;
     }
 
 
