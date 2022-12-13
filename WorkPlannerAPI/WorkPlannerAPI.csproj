@@ -13,8 +13,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\DatabaseConnection\DatabaseConnection.csproj" />
-      <ProjectReference Include="..\FileData\FileData.csproj" />
-      <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
 </Project>
