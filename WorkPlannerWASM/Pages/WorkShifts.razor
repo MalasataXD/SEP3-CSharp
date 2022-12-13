@@ -402,7 +402,6 @@
             }
             workShift.ShiftId = id;
 
-            Console.WriteLine(workShift.ShiftId);
             WorkShiftsToCreate.Add(workShift);
             
             List<WorkShift> workShifts = _workShifts.ToList();
@@ -493,7 +492,6 @@
 
             if (online)
             {
-                Console.WriteLine(shiftId);
                 WorkShiftUpdateDto updateDto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
                 await WorkShiftService.UpdateAsync(updateDto);
             }
@@ -590,7 +588,7 @@
             await WorkShiftService.UpdateAsync(updatedDtos.AsEnumerable());
             await WorkShiftService.DeleteAsync(WorkShiftsToDelete);
             
-            Thread.Sleep(1000);
+            Thread.Sleep((WorkShiftsToCreate.Count + WorkShiftsToUpdate.Count + WorkShiftsToDelete.Count)*100);
             
             await UpdateSchema();
             
