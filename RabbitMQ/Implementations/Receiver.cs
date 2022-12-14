@@ -68,9 +68,7 @@ public class Receiver
                 var message = Encoding.UTF8.GetString(body);
                 MessageHeader? messageHeader = JsonSerializer.Deserialize<MessageHeader>(message);
                 Console.WriteLine(" [x] Received {0}", messageHeader);
-                
-                Console.WriteLine(messageHeader.payload + " Class: " + messageHeader.payload.GetType());
-                
+
                 object val;
                 if (map.TryGetValue(messageHeader.action, out val))
                 {

@@ -65,7 +65,6 @@ public class WorkShiftDao : IWorkShiftDao
             foreach (var item in dto)
             {
                 
-                Console.WriteLine(oldItemWorkerId + " != " + item.workerId);
                 if (oldItemWorkerId != item.workerId)
                 {
                     worker = await workerDao.GetByIdAsync(item.workerId);
@@ -130,8 +129,6 @@ public class WorkShiftDao : IWorkShiftDao
     {
         try
         {
-            Console.WriteLine("toUpdate shift : " + toUpdate.BreakAmount);
-            Console.WriteLine(JsonSerializer.Serialize(toUpdate));
             sender.EditShift(toUpdate);
 
             object obj = await receiver.Receive("EditShift");
@@ -222,8 +219,6 @@ public class WorkShiftDao : IWorkShiftDao
     {
         string formattedHour = hour < 10 ? "0" + hour : "" + hour;
         string formattedMinute = minute < 10 ? "0" + minute : "" + minute;
-
-        Console.WriteLine(formattedHour + ":" + formattedMinute);
         
         return formattedHour + ":" + formattedMinute;
     }

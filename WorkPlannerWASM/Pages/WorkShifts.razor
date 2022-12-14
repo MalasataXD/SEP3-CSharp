@@ -402,7 +402,6 @@
             }
             workShift.ShiftId = id;
 
-            Console.WriteLine(workShift.ShiftId);
             WorkShiftsToCreate.Add(workShift);
             
             List<WorkShift> workShifts = _workShifts.ToList();
@@ -493,7 +492,6 @@
 
             if (online)
             {
-                Console.WriteLine(shiftId);
                 WorkShiftUpdateDto updateDto = new(Int32.Parse(shiftId), Int32.Parse(workerId), date, fromTime, toTime, breakAmount);
                 await WorkShiftService.UpdateAsync(updateDto);
             }
@@ -575,7 +573,6 @@
             List<WorkShiftCreationDto> createDtos = new ();
             List<WorkShiftUpdateDto> updatedDtos = new ();
 
-
             foreach (var shift in WorkShiftsToCreate)
             {
                 WorkShiftCreationDto dto = new(shift.Date, shift.FromTime, shift.ToTime, shift.Worker.WorkerId, shift.BreakAmount, "1");
@@ -586,31 +583,25 @@
                 WorkShiftUpdateDto dto = new(shift.ShiftId, shift.Worker.WorkerId, shift.Date, shift.FromTime, shift.ToTime, shift.BreakAmount);
                 updatedDtos.Add(dto);
             }
-
-            Console.WriteLine(createDtos.AsEnumerable().Count());
-            Console.WriteLine(updatedDtos.AsEnumerable().Count());
-            Console.WriteLine(WorkShiftsToDelete.Count);
         
             await WorkShiftService.CreateAsync(createDtos.AsEnumerable());
             await WorkShiftService.UpdateAsync(updatedDtos.AsEnumerable());
             await WorkShiftService.DeleteAsync(WorkShiftsToDelete);
-
+            
+            Thread.Sleep((WorkShiftsToCreate.Count + WorkShiftsToUpdate.Count + WorkShiftsToDelete.Count)*100);
+            
+            await UpdateSchema();
+            
             WorkShiftsToCreate.Clear();
             WorkShiftsToUpdate.Clear();
             WorkShiftsToDelete.Clear();
-
-            Thread.Sleep(1000);
-            await UpdateSchema();
-
         }
         catch
         {
             isWaiting = false;
-
         }
         isWaiting = false;
         CloseCreateWorkShiftsConfirmationPopUp();
-        
     }
     
     
