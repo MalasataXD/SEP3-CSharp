@@ -175,7 +175,7 @@
 
     if (online)
     {
-        <button @onclick="() => online = false" disabled="@isWaiting">LIVE
+        <button @onclick="GoOffline" disabled="@isWaiting">LIVE
         </button>
     }
     else
@@ -669,10 +669,20 @@
     {
         isWaiting = true;
         online = true;
+        WorkShiftsToCreate.Clear();
+        WorkShiftsToUpdate.Clear();
+        WorkShiftsToDelete.Clear();
         await UpdateSchema();
         CloseOnlineConfirmationPopUp();
         isWaiting = false;
     }
 
-
+    private void GoOffline()
+    {
+        online = false;
+        WorkShiftsToCreate.Clear();
+        WorkShiftsToUpdate.Clear();
+        WorkShiftsToDelete.Clear();
+    }
+    
 }
